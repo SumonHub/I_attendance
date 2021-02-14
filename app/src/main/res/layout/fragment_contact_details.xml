@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.individual_user.ui.profile.fragment.ContactDetailsFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="1"
+            android:orientation="horizontal"
+            android:padding="@dimen/default_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/lPresentAddress"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_marginBottom="@dimen/default_margin">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputPresentAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:hint="Present address" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/lPermanentAddress"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_marginBottom="@dimen/default_margin">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputPermanentAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:hint="Permanent address" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- <com.google.android.material.textfield.TextInputLayout
+                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                 android:layout_height="wrap_content"
+                 android:layout_columnWeight="1"
+                 android:id="@+id/lEmail"
+                 android:layout_marginBottom="@dimen/default_margin">
+
+                 <com.google.android.material.textfield.TextInputEditText
+                     android:id="@+id/inputEmail"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:enabled="false"
+                     android:maxLines="1"
+                     android:inputType="textEmailAddress"
+                     android:hint="Email" />
+             </com.google.android.material.textfield.TextInputLayout>
+
+             <com.google.android.material.textfield.TextInputLayout
+                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                 android:layout_height="wrap_content"
+                 android:id="@+id/lMobile"
+                 android:layout_columnWeight="1">
+
+                 <com.google.android.material.textfield.TextInputEditText
+                     android:id="@+id/inputMobile"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:enabled="false"
+                     android:inputType="number"
+                     android:maxLines="1"
+                     android:maxLength="11"
+                     android:hint="Mobile" />
+             </com.google.android.material.textfield.TextInputLayout>-->
+
+        </GridLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_row="1"
+        android:layout_column="7"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/default_margin"
+        android:clickable="true"
+        android:text="Edit"
+        android:textColor="@color/white"
+        app:icon="@drawable/icon_edit_64"
+        app:iconTint="@color/white"
+        tools:ignore="ContentDescription" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

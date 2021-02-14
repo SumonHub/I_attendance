@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    tools:context=".ui.individual_user.SingleUserActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:elevation="3dp"
+            android:padding="@dimen/default_margin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="What do you want to do today?"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/uBloodGroup"
+                app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/bg"
+                app:borderWidth="0dp"
+                app:elevation="1dp"
+                app:fabSize="normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_backspace_24" />
+
+            <TextView
+                android:id="@+id/uName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Sumon hasan"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/uRole"
+                app:layout_constraintStart_toEndOf="@+id/fabBack"
+                app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+            <TextView
+                android:id="@+id/uPhone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="01515688540"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/uDesignation"
+                app:layout_constraintStart_toStartOf="@+id/uDesignation"
+                app:layout_constraintTop_toBottomOf="@+id/uDesignation" />
+
+            <TextView
+                android:id="@+id/uEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="sumon.v0.0@gmail.com"
+
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/uPhone"
+                app:layout_constraintStart_toStartOf="@+id/uPhone"
+                app:layout_constraintTop_toBottomOf="@+id/uPhone" />
+
+            <TextView
+                android:id="@+id/uDesignation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Android Developer - Software"
+                android:textAllCaps="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/uName"
+                app:layout_constraintTop_toBottomOf="@+id/uName" />
+
+            <TextView
+                android:id="@+id/uJoiningDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Joining date: 10-10-2020"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/uEmail"
+                app:layout_constraintStart_toStartOf="@+id/uEmail"
+                app:layout_constraintTop_toBottomOf="@+id/uEmail" />
+
+            <TextView
+                android:id="@+id/uBloodGroup"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Blood group: O+"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/uJoiningDate"
+                app:layout_constraintStart_toStartOf="@+id/uJoiningDate"
+                app:layout_constraintTop_toBottomOf="@+id/uJoiningDate" />
+
+            <TextView
+                android:id="@+id/uRole"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_admin"
+                android:padding="8dp"
+                android:text="admin"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="@+id/uName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/uName" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Good Day!"
+                app:layout_constraintStart_toStartOf="@+id/uName"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_gray_border_round"
+                app:layout_constraintStart_toStartOf="@+id/uBloodGroup"
+                app:layout_constraintTop_toBottomOf="@+id/uBloodGroup"
+                app:srcCompat="@drawable/ic_filter_list_24" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="view CV"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+                app:layout_constraintStart_toEndOf="@+id/imageView4"
+                app:layout_constraintTop_toTopOf="@+id/imageView4" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="66dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/secInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:layout_marginEnd="@dimen/default_margin"
+                    android:background="@color/white">
+
+                    <TextView
+                        android:id="@+id/info"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/default_margin"
+                        android:text="Loading..."
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/spin_kit"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.github.ybq.android.spinkit.SpinKitView
+                        android:id="@+id/spin_kit"
+                        style="@style/SpinKitView.DoubleBounce"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        app:SpinKit_Color="@color/colorAccent"
+                        app:layout_constraintBottom_toBottomOf="@+id/info"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/info" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:layout_marginEnd="@dimen/default_margin"
+                    android:background="@color/white"
+                    android:elevation="@dimen/my_card_elevation"
+                    android:orientation="vertical"
+                    android:padding="@dimen/default_margin"
+                    tools:ignore="UselessParent">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/default_margin"
+                        android:text="Report" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/fabAttendanceReport"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:outlineSpotShadowColor="@color/white"
+                        android:text="Attendance Report"
+                        app:backgroundTint="@color/bg"
+                        app:borderWidth="0dp"
+                        app:elevation="0dp"
+                        app:icon="@drawable/icon_time_machine_50"
+                        app:iconGravity="textStart" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/fabLeaveReport"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center"
+                        android:outlineSpotShadowColor="@color/white"
+                        android:text="Leave report"
+                        app:backgroundTint="@color/bg"
+                        app:borderWidth="0dp"
+                        app:elevation="0dp"
+                        app:icon="@drawable/icon_time_machine_50"
+                        app:iconGravity="textStart" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/default_margin"
+                    android:layout_marginTop="@dimen/default_margin"
+                    android:layout_marginEnd="@dimen/default_margin"
+                    android:background="@color/white"
+                    android:elevation="@dimen/my_card_elevation"
+                    android:orientation="vertical"
+                    android:padding="@dimen/default_margin"
+                    tools:ignore="UselessParent">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/default_margin"
+                        android:text="Setting" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/fabEditInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:outlineSpotShadowColor="@color/white"
+                        android:text="Edit info (admin)"
+                        app:backgroundTint="@color/bg"
+                        app:borderWidth="0dp"
+                        app:elevation="0dp"
+                        app:icon="@drawable/icon_time_machine_50"
+                        app:iconGravity="textStart"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/fabProfileInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/default_margin"
+                        android:gravity="center"
+                        android:outlineSpotShadowColor="@color/white"
+                        android:text="Profile info"
+                        app:backgroundTint="@color/bg"
+                        app:borderWidth="0dp"
+                        app:elevation="0dp"
+                        app:icon="@drawable/icon_time_machine_50"
+                        app:iconGravity="textStart"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/fabResetPass"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/default_margin"
+                        android:gravity="center"
+                        android:outlineSpotShadowColor="@color/white"
+                        android:text="Reset password"
+                        app:backgroundTint="@color/bg"
+                        app:borderWidth="0dp"
+                        app:elevation="0dp"
+                        app:icon="@drawable/icon_time_machine_50"
+                        app:iconGravity="textStart"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+    <include layout="@layout/bottom_sheet_attendance" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
