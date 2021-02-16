@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg"
     app:layoutDescription="@xml/activity_dashboard_scene"
-    tools:context=".DashboardActivity">
+    tools:context=".view.ui.DashboardActivity">
 
     <View
         android:id="@+id/header"

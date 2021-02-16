@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.infinity.i_attendance">
+    package="com.infinity.attendance">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -19,24 +19,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.individual_user.ui.profile.ProfileInfoActivity" />
-        <activity android:name=".ui.setting.holiday_setting.SettingHolidayActivity" />
-        <activity android:name=".ui.setting.department_setting.SettingDesignationActivity" />
-        <activity android:name=".ui.setting.department_setting.SettingDepartmentActivity" />
-        <activity android:name=".ui.manage_leave.ManageLeaveActivity" />
-        <activity android:name=".ui.individual_user.SingleUserActivity" />
-        <activity android:name=".ui.setting.leave_type.SettingLeaveActivity" />
-        <activity android:name=".ui.ProfileActivity" />
-        <activity android:name=".ui.manage_user.ManageUserActivity" />
-        <activity android:name=".ui.setting.office_time.SettingOfficeTimeActivity" />
-        <activity android:name=".ui.setting.role.SettingRoleActivity" />
-        <activity android:name=".ui.setting.SettingActivity" />
-        <activity android:name=".ui.individual_user.ui.leave_report.LeaveHistoryActivity" />
+        <activity android:name=".view.ui.individual_user.profile.ProfileInfoActivity" />
+        <activity android:name=".view.ui.setting.SettingHolidayActivity" />
+        <activity android:name=".view.ui.setting.department_setting.SettingDesignationActivity" />
+        <activity android:name=".view.ui.setting.department_setting.SettingDepartmentActivity" />
+        <activity android:name=".view.ui.manage_leave.ManageLeaveActivity" />
+        <activity android:name=".view.ui.individual_user.SingleUserActivity" />
+        <activity android:name=".view.ui.setting.leave_type.SettingLeaveActivity" />
+        <activity android:name="com.infinity.attendance.view.ui.ProfileActivity" />
+        <activity android:name=".view.ui.manage_user.ManageUserActivity" />
+        <activity android:name=".view.ui.setting.office_time.SettingOfficeTimeActivity" />
+        <activity android:name=".view.ui.setting.role.SettingRoleActivity" />
+        <activity android:name=".view.ui.setting.SettingActivity" />
+        <activity android:name=".view.ui.individual_user.leave_report.LeaveHistoryActivity" />
         <activity
-            android:name=".ui.individual_user.ui.attendance_report.AttendanceActivity"
+            android:name=".view.ui.individual_user.attendance_report.AttendanceActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".view.ui.login.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +45,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DashboardActivity"
+            android:name="com.infinity.attendance.view.ui.DashboardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

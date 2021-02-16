@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.manage_leave.fragment.PendingLeaveFragment">
+    tools:context=".view.ui.manage_leave.fragment.PendingLeaveFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAllLeaveHistory"
@@ -24,7 +24,7 @@
         android:background="@drawable/bg_white_ripple_black"
         android:elevation="@dimen/my_card_elevation"
         android:padding="@dimen/default_margin"
-        android:text="@string/emptyMsg"
+        android:text="@string/empty_msg"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

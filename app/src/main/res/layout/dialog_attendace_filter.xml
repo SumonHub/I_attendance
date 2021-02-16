@@ -76,7 +76,7 @@
                 android:focusable="false"
                 android:hint="From"
                 android:inputType="none"
-                android:text="@string/emptyMsg" />
+                android:text="@string/empty_msg" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -99,7 +99,7 @@
                 android:focusable="false"
                 android:hint="To"
                 android:inputType="none"
-                android:text="@string/emptyMsg" />
+                android:text="@string/empty_msg" />
         </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>

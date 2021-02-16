@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg"
-    tools:context=".ui.individual_user.ui.leave_report.LeaveHistoryActivity">
+    tools:context=".view.ui.individual_user.leave_report.LeaveHistoryActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -54,7 +54,7 @@
         android:background="@drawable/bg_white_ripple_black"
         android:elevation="@dimen/my_card_elevation"
         android:padding="@dimen/default_margin"
-        android:text="@string/emptyMsg"
+        android:text="@string/empty_msg"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
