@@ -7,9 +7,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,9 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.Holiday;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
@@ -44,17 +42,14 @@ public class AdapterHoliday extends RecyclerView.Adapter<AdapterHoliday.Departme
     int cMonth = c.get(Calendar.MONTH);
     int cDay = c.get(Calendar.DAY_OF_MONTH);
     //
-    User superUser;
     private List<Holiday> holidayList = new ArrayList<>();
-    private OnDataUpdateListener onDataUpdateListener;
-    private String selectedDateStr;
-    //
+    private OnDataUpdateListener<List<Holiday>> onDataUpdateListener;
 
     public AdapterHoliday(Context context) {
         this.context = context;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<Holiday>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -73,7 +68,6 @@ public class AdapterHoliday extends RecyclerView.Adapter<AdapterHoliday.Departme
     @Override
     public void onBindViewHolder(@NonNull DepartmentViewHolder holder, int position) {
 
-        superUser = SharedPrefsHelper.getSuperUser(context);
         Holiday holiday = holidayList.get(position);
         holder.name.setText(holiday.getName());
         holder.date.setText(holiday.getDate());
@@ -93,10 +87,10 @@ public class AdapterHoliday extends RecyclerView.Adapter<AdapterHoliday.Departme
                         .setIcon(R.drawable.ic_stop_hand_64)
                         .setTitle("Warning")
                         .setMessage("Are your sure to delete? It may causes for data corruption. ")
-                        .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteHoliday(holiday);
+                                _deleteHoliday(holiday);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -112,14 +106,16 @@ public class AdapterHoliday extends RecyclerView.Adapter<AdapterHoliday.Departme
 
     }
 
-    private void deleteHoliday(Holiday holiday) {
-
+    private void _deleteHoliday(Holiday holiday) {
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.deleteHoliday(superUser.getApi_key(), holiday.getId(), Holiday.DELETE).observe((LifecycleOwner) this, new Observer<ApiResponse<Holiday>>() {
+        dataViewModel.deleteHoliday(holiday.getId()).observe((LifecycleOwner) context, new Observer<ApiResponse<Holiday>>() {
             @Override
             public void onChanged(ApiResponse<Holiday> holidayApiResponse) {
-                if (holidayApiResponse != null && holidayApiResponse.isError()) {
-                    onDataUpdateListener.onSuccessfulDataUpdated();
+                if (holidayApiResponse != null && !holidayApiResponse.isError()) {
+                    if (holidayApiResponse != null) {
+                        onDataUpdateListener.onSuccessfulDataUpdated(holidayApiResponse.getData());
+                    }
+
                 } else {
                     Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                 }
@@ -131,11 +127,10 @@ public class AdapterHoliday extends RecyclerView.Adapter<AdapterHoliday.Departme
 
         // set the custom layout
         final View customLayout = LayoutInflater.from(context).inflate(R.layout.dialog_add_holiday, null);
-        EditText editText = customLayout.findViewById(R.id.inputText);
-        editText.setText(holiday.getName());
-        TextInputEditText datePicker = customLayout.findViewById(R.id.datePicker);
-        selectedDateStr = holiday.getDate();
-        datePicker.setText(selectedDateStr);
+        TextInputEditText inputName = customLayout.findViewById(R.id.inputName);
+        inputName.setText(holiday.getName());
+        AutoCompleteTextView datePicker = customLayout.findViewById(R.id.datePicker);
+        datePicker.setText(holiday.getDate());
         //
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,8 +143,9 @@ public class AdapterHoliday extends RecyclerView.Adapter<AdapterHoliday.Departme
                                                   int monthOfYear, int dayOfMonth) {
                                 Calendar calendar = Calendar.getInstance();
                                 calendar.set(year, monthOfYear, dayOfMonth);
-                                selectedDateStr = new SimpleDateFormat("yyyy-MMMM-dd", Locale.ENGLISH).format(calendar.getTime());
+                                String selectedDateStr = new SimpleDateFormat("yyyy-MMMM-dd", Locale.ENGLISH).format(calendar.getTime());
                                 datePicker.setText(selectedDateStr);
+                                holiday.setDate(selectedDateStr);
                             }
                         }, cYear, cMonth, cDay).show();
             }
@@ -168,24 +164,23 @@ public class AdapterHoliday extends RecyclerView.Adapter<AdapterHoliday.Departme
                     @Override
                     public void onClick(View view) {
 
-                        if (TextUtils.isEmpty(editText.getText()) || TextUtils.isEmpty(datePicker.getText())) {
-                            editText.setError("can't be empty");
+                        if (TextUtils.isEmpty(inputName.getText()) || TextUtils.isEmpty(datePicker.getText())) {
+                            inputName.setError("can't be empty");
                             datePicker.setError("can't be empty");
                             return;
                         }
 
+                        holiday.setName(inputName.getText().toString());
 
                         DataViewModel dataViewModel = new DataViewModel();
-                        dataViewModel.updateHoliday(superUser.getApi_key(),
-                                holiday.getId(),
-                                editText.getText().toString(),
-                                selectedDateStr,
-                                Holiday.UPDATE).observe((LifecycleOwner) context, new Observer<ApiResponse>() {
+                        dataViewModel.updateHoliday(holiday).observe((LifecycleOwner) context, new Observer<ApiResponse<Holiday>>() {
                             @Override
-                            public void onChanged(ApiResponse apiResponse) {
-                                if (apiResponse != null && !apiResponse.isError()) {
+                            public void onChanged(ApiResponse<Holiday> holidayApiResponse) {
+                                if (holidayApiResponse != null && !holidayApiResponse.isError()) {
                                     Toast.makeText(context, "Successfully updated.", Toast.LENGTH_SHORT).show();
-                                    onDataUpdateListener.onSuccessfulDataUpdated();
+                                    if (onDataUpdateListener != null) {
+                                        onDataUpdateListener.onSuccessfulDataUpdated(holidayApiResponse.getData());
+                                    }
                                 } else {
                                     Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                                 }

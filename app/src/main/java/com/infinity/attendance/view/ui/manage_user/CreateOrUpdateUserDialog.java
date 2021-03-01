@@ -20,7 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -61,11 +60,6 @@ import render.animations.Render;
 
 import static android.app.Activity.RESULT_OK;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CreateOrUpdateUserDialog#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CreateOrUpdateUserDialog extends DialogFragment {
 
     public static final String TAG = "CreateOrUpdateUser";
@@ -91,7 +85,7 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
     private TextInputLayout lInputCV;
     private TextInputEditText inputCv;
     private FloatingActionButton fabAddUser;
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<Boolean> onDataUpdateListener;
 
     private int dpt_id, dg_id, roleId;
     private String nameText, phoneNumberText, emailText, designationText, departmentText, joiningDateText, bloodGroupText;
@@ -110,7 +104,7 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
         return fragment;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<Boolean> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -334,12 +328,12 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
         updatedUser.setRole_id(roleId);
 
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.updateUser(selectedUser.getApi_key(), updatedUser)
+        dataViewModel.updateUser(updatedUser)
                 .observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
                     @Override
                     public void onChanged(ApiResponse apiResponse) {
-                        if (apiResponse != null && !apiResponse.isError()) {
-                            onDataUpdateListener.onSuccessfulDataUpdated();
+                        if (apiResponse != null) {
+                            onDataUpdateListener.onSuccessfulDataUpdated(true);
                             CreateOrUpdateUserDialog.this.dismiss();
                             Toast.makeText(getContext(), apiResponse.getMsg(), Toast.LENGTH_SHORT).show();
                         } else {
@@ -364,12 +358,12 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
         Log.d(TAG, "createUser: " + newUser);
 
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.createUser(selectedUser.getApi_key(), newUser)
+        dataViewModel.addUser(newUser)
                 .observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
                     @Override
                     public void onChanged(ApiResponse apiResponse) {
-                        if (apiResponse != null && !apiResponse.isError()) {
-                            onDataUpdateListener.onSuccessfulDataUpdated();
+                        if (apiResponse != null) {
+                            onDataUpdateListener.onSuccessfulDataUpdated(true);
                             CreateOrUpdateUserDialog.this.dismiss();
                             Toast.makeText(getContext(), apiResponse.getMsg(), Toast.LENGTH_SHORT).show();
                         } else {
@@ -426,15 +420,15 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
 
     private void _configRoleSelect() {
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.getAllUserRole(selectedUser.getApi_key())
+        dataViewModel.getAllUserRole()
                 .observe(getViewLifecycleOwner(), new Observer<ApiResponse<Role>>() {
                     @Override
                     public void onChanged(ApiResponse<Role> roleApiResponse) {
-                        if (roleApiResponse != null && !roleApiResponse.isError()) {
+                        if (roleApiResponse != null) {
                             ArrayAdapter<Role> adapter = new ArrayAdapter<>(
                                     getContext(),
                                     android.R.layout.simple_dropdown_item_1line,
-                                    roleApiResponse.getResults());
+                                    roleApiResponse.getData());
 
                             inputUserRole.setAdapter(adapter);
                             inputUserRole.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -455,15 +449,15 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
     private void _configDpt() {
 
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.getAllDepartment(selectedUser.getApi_key())
+        dataViewModel.getAllDepartment()
                 .observe(getViewLifecycleOwner(), new Observer<ApiResponse<Department>>() {
                     @Override
                     public void onChanged(ApiResponse<Department> roleApiResponse) {
-                        if (roleApiResponse != null && !roleApiResponse.isError()) {
+                        if (roleApiResponse != null) {
                             ArrayAdapter<Department> adapter = new ArrayAdapter<>(
                                     getContext(),
                                     android.R.layout.simple_dropdown_item_1line,
-                                    roleApiResponse.getResults());
+                                    roleApiResponse.getData());
 
                             inputDepartment.setAdapter(adapter);
                             inputDepartment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -488,12 +482,12 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
 
     private void _configDg(int id) {
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.getDesignation(superUser.getApi_key(), id)
+        dataViewModel.getDesignationByDpt(id)
                 .observe(getViewLifecycleOwner(), new Observer<ApiResponse<Designation>>() {
                     @Override
                     public void onChanged(ApiResponse<Designation> designationApiResponse) {
-                        if (designationApiResponse != null && !designationApiResponse.isError()) {
-                            if (designationApiResponse.getResults().size() == 0) {
+                        if (designationApiResponse != null) {
+                            if (designationApiResponse.getData().size() == 0) {
                                 Toast.makeText(getContext(), "Designation not added yet!", Toast.LENGTH_SHORT).show();
                                 return;
                             }
@@ -501,7 +495,7 @@ public class CreateOrUpdateUserDialog extends DialogFragment {
                             ArrayAdapter<Designation> adapter = new ArrayAdapter<>(
                                     getContext(),
                                     android.R.layout.simple_dropdown_item_1line,
-                                    designationApiResponse.getResults());
+                                    designationApiResponse.getData());
 
                             inputDesignation.setAdapter(adapter);
                             inputDesignation.setOnItemClickListener(new AdapterView.OnItemClickListener() {

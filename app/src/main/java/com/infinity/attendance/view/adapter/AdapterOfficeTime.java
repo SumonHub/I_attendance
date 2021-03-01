@@ -27,13 +27,13 @@ import java.util.List;
 public class AdapterOfficeTime extends RecyclerView.Adapter<AdapterOfficeTime.OfficeTimeViewHolder> {
     private final Context context;
     private List<OfficeTime> officeTimeList = new ArrayList<>();
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<OfficeTime>> onDataUpdateListener;
 
     public AdapterOfficeTime(Context context) {
         this.context = context;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<OfficeTime>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -75,10 +75,12 @@ public class AdapterOfficeTime extends RecyclerView.Adapter<AdapterOfficeTime.Of
                 EditOfficeTimeDialog editOfficeTimeDialog = EditOfficeTimeDialog.newInstance(bundle);
                 FragmentTransaction ft2 = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
                 editOfficeTimeDialog.show(ft2, EditOfficeTimeDialog.TAG);
-                editOfficeTimeDialog.setOnDataUpdateListener(new OnDataUpdateListener() {
+                editOfficeTimeDialog.setOnDataUpdateListener(new OnDataUpdateListener<List<OfficeTime>>() {
                     @Override
-                    public void onSuccessfulDataUpdated() {
-                        onDataUpdateListener.onSuccessfulDataUpdated();
+                    public void onSuccessfulDataUpdated(List<OfficeTime> object) {
+                        if (onDataUpdateListener != null) {
+                            onDataUpdateListener.onSuccessfulDataUpdated(object);
+                        }
                     }
                 });
             }

@@ -23,9 +23,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.OfficeTime;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
@@ -33,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class EditOfficeTimeDialog extends DialogFragment {
     public static final String TAG = "EditOfficeTimeDialog";
@@ -44,7 +43,7 @@ public class EditOfficeTimeDialog extends DialogFragment {
     int cMonth = c.get(Calendar.MONTH);
     int cDay = c.get(Calendar.DAY_OF_MONTH);
     private OfficeTime selectedOfficeTime;
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<OfficeTime>> onDataUpdateListener;
     private Date startTime, endTime;
 
     public static EditOfficeTimeDialog newInstance(Bundle bundle) {
@@ -53,7 +52,7 @@ public class EditOfficeTimeDialog extends DialogFragment {
         return fragment;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<OfficeTime>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -176,19 +175,17 @@ public class EditOfficeTimeDialog extends DialogFragment {
 
     private void updateOfficeTime() {
 
-        Log.d(TAG, "updateOfficeTime: " + selectedOfficeTime);
-
-        User superuser = SharedPrefsHelper.getSuperUser(getContext());
-
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.updateOfficeTime(superuser.getApi_key(), selectedOfficeTime)
-                .observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
+        dataViewModel.updateOfficeTime(selectedOfficeTime)
+                .observe(getViewLifecycleOwner(), new Observer<ApiResponse<OfficeTime>>() {
                     @Override
-                    public void onChanged(ApiResponse apiResponse) {
-                        if (apiResponse != null && !apiResponse.isError()) {
-                            Toast.makeText(getContext(), apiResponse.getMsg(), Toast.LENGTH_SHORT).show();
-                            onDataUpdateListener.onSuccessfulDataUpdated();
-                            EditOfficeTimeDialog.this.dismiss();
+                    public void onChanged(ApiResponse<OfficeTime> officeTimeApiResponse) {
+                        if (officeTimeApiResponse != null && !officeTimeApiResponse.isError()) {
+                            if (onDataUpdateListener != null) {
+                                Toast.makeText(getContext(), "Successfully updated.", Toast.LENGTH_SHORT).show();
+                                onDataUpdateListener.onSuccessfulDataUpdated(officeTimeApiResponse.getData());
+                                EditOfficeTimeDialog.this.dismiss();
+                            }
                         } else {
                             Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                         }

@@ -4,8 +4,8 @@ public class Leave {
     public static final int PENDING = 0;
     public static final int APPROVED = 1;
     public static final int DECLINED = 2;
-    int id, uid;
-    String uname, apply_date, purpose, from_date, to_date, name;
+    int id;
+    String uid, uname, apply_date, purpose, from_date, to_date, name;
     int type_id, status;
 
     public String getUname() {
@@ -16,11 +16,11 @@ public class Leave {
         this.uname = uname;
     }
 
-    public int getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(int uid) {
+    public void setUid(String uid) {
         this.uid = uid;
     }
 

@@ -14,14 +14,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     public static final String BASE_UPLOAD_URL = "https://192.168.0.206/android/iattendance/api/src/v1/uploads/";
-    private static final String BASE_URL = "http://103.205.180.178/android/iattendance/api/src/v1/";
-    private static final String BASE_URL_LOCAL = "https://192.168.100.198/iattendance/api/src/v1/";
+    private static final String BASE_URL = "http://103.205.180.178/android/iattendance/app/";
+    private static final String BASE_URL_LOCAL = "https://192.168.100.198/iattendance/app/";
     private static Retrofit retrofit;
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
             retrofit = new retrofit2.Retrofit.Builder()
-                    .baseUrl(BASE_URL_LOCAL)
+                    .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(getUnsafeOkHttpClient().build())
                     .build();

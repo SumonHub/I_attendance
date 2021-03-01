@@ -3,6 +3,7 @@ package com.infinity.attendance.view.ui.individual_user.leave_report;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -25,7 +26,9 @@ import com.infinity.attendance.view.ui.manage_user.CreateOrUpdateUserDialog;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
-public class LeaveHistoryActivity extends AppCompatActivity implements OnDataUpdateListener {
+import java.util.List;
+
+public class LeaveHistoryActivity extends AppCompatActivity {
 
     private static final String TAG = "LeaveHistoryActivity";
     private AdapterLeaveHistory adapter;
@@ -37,7 +40,6 @@ public class LeaveHistoryActivity extends AppCompatActivity implements OnDataUpd
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leave_history);
-
 
         stringSelectedUser = getIntent().getStringExtra(ConstantKey.SELECTED_USER);
         selectedUser = new Gson().fromJson(stringSelectedUser, User.class);
@@ -54,15 +56,15 @@ public class LeaveHistoryActivity extends AppCompatActivity implements OnDataUpd
         //
 
         emptyMsg = findViewById(R.id.emptyMsg);
-        RecyclerView rvLeaveHistory = findViewById(R.id.rvLeaveHistory);
         adapter = new AdapterLeaveHistory(this);
 
+        RecyclerView rvLeaveHistory = findViewById(R.id.rvLeaveHistory);
         rvLeaveHistory.setHasFixedSize(true);
         rvLeaveHistory.setLayoutManager(new LinearLayoutManager(this));
         rvLeaveHistory.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         rvLeaveHistory.setAdapter(adapter);
 
-        bindRv();
+        _getData();
 
         //
         FloatingActionButton fabApplyLeave = findViewById(R.id.fabApplyLeave);
@@ -81,33 +83,35 @@ public class LeaveHistoryActivity extends AppCompatActivity implements OnDataUpd
                 //
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 applyLeaveDialog.show(ft, CreateOrUpdateUserDialog.TAG);
-                applyLeaveDialog.setOnDataUpdateListener(LeaveHistoryActivity.this);
+                applyLeaveDialog.setOnDataUpdateListener(new OnDataUpdateListener<List<Leave>>() {
+                    @Override
+                    public void onSuccessfulDataUpdated(List<Leave> object) {
+                        Toast.makeText(LeaveHistoryActivity.this, "Successfully applied", Toast.LENGTH_SHORT).show();
+                        _updateAdapter(object);
+                    }
+                });
             }
         });
     }
 
-    private void bindRv() {
-
-        // TODO: 9/2/2020 pass apiKey for which user you want to get history
-
+    private void _getData() {
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getUserLeaveHistory(selectedUser.getApi_key()).observe(this, new Observer<ApiResponse<Leave>>() {
+        dataViewModel.getLeaveHistory(selectedUser.getUid()).observe(this, new Observer<ApiResponse<Leave>>() {
             @Override
             public void onChanged(ApiResponse<Leave> leaveApiResponse) {
-                if (leaveApiResponse != null && !leaveApiResponse.isError()) {
-                    adapter.updateLeaveList(leaveApiResponse.getResults());
-                    if (adapter.getItemCount() > 0) {
-                        emptyMsg.setVisibility(View.GONE);
-                    } else {
-                        emptyMsg.setVisibility(View.VISIBLE);
-                    }
+                if (leaveApiResponse != null) {
+                    _updateAdapter(leaveApiResponse.getData());
                 }
             }
         });
     }
 
-    @Override
-    public void onSuccessfulDataUpdated() {
-        bindRv();
+    public void _updateAdapter(List<Leave> data) {
+        adapter.updateLeaveList(data);
+        if (adapter.getItemCount() > 0) {
+            emptyMsg.setVisibility(View.GONE);
+        } else {
+            emptyMsg.setVisibility(View.VISIBLE);
+        }
     }
 }

@@ -15,169 +15,162 @@ import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface RetrofitInterface {
 
-    @POST("login")
+    //-------------- user ----------------
+
+    @GET("login")
     Call<ApiResponse<User>> requestLogin(
             @Query("uid") String uid,
             @Query("password") String password
     );
 
-
-    @POST("createOrUpdateUserRole")
-    Call<ApiResponse> createOrUpdateUserRole(
-            @Header("api_key") String api_key,
-            @Body Role role
-    );
-
-    @POST("getAllUserRole")
-    Call<ApiResponse<Role>> getAllUserRole(
-            @Header("api_key") String api_key
-    );
-
-    //-------------- user ----------------
-
-    @POST("getUserByKey")
-    Call<ApiResponse<User>> getUserByKey(
-            @Header("api_key") String api_key
-    );
-
-    @POST("getAllUser")
-    Call<ApiResponse<User>> getAllUser(
-            @Header("api_key") String api_key
-    );
-
-    @POST("createUser")
-    Call<ApiResponse<User>> createUser(
-            @Header("api_key") String api_key,
+    @GET("createUser")
+    Call<ApiResponse<User>> addUser(
             @Body User user
     );
 
-    @POST("updateUser")
-    Call<ApiResponse> updateUser(
-            @Header("api_key") String api_key,
+    @GET("updateUser")
+    Call<ApiResponse<User>> updateUser(
             @Body User updatedUser
     );
 
-    @POST("addUserInfo")
-    Call<ApiResponse> addUserInfo(
-            @Header("api_key") String api_key,
+    @GET("addUserInfo/{uid}")
+    Call<ApiResponse<UserInfo>> addUserInfo(
+            @Path("uid") String uid,
             @Body UserInfo userInfo
     );
 
-    @POST("getUserInfoByKey")
-    Call<ApiResponse<UserInfo>> getUserInfoByKey(
-            @Header("api_key") String api_key
+    @GET("getUserInfo/{uid}")
+    Call<ApiResponse<UserInfo>> getUserInfo(
+            @Path("uid") String uid
     );
 
-    @POST("resetPassword")
-    Call<ApiResponse> resetPassword(
-            @Header("api_key") String api_key,
+    @GET("getUser/{id}")
+    Call<ApiResponse<User>> getUser(
+            @Path("id") String uid
+    );
+
+    @GET("resetPassword/{uid}")
+    Call<ApiResponse<User>> resetPassword(
+            @Path("uid") String uid,
             @Query("new_password") String new_password
     );
 
-    //----------------------------
+    //---------------- role ---------------
 
-    @POST("getLeaveType")
-    Call<ApiResponse<LeaveType>> getLeaveType(
-            @Header("api_key") String api_key
+    @GET("getRole")
+    Call<ApiResponse<Role>> getRole();
+
+    @POST("addRole")
+    Call<ApiResponse<Role>> addRole(
+            @Body Role role
     );
 
-    @POST("actionLeaveType")
-    Call<ApiResponse> actionLeaveType(
-            @Header("api_key") String api_key,
-            @Body LeaveType leaveType,
-            @Query("action_code") int action_code
+    @POST("updateRole")
+    Call<ApiResponse<Role>> updateRole(
+            @Body Role role
     );
 
-    @POST("getUserLeaveHistory")
-    Call<ApiResponse<Leave>> getUserLeaveHistory(
-            @Header("api_key") String api_key
+    @GET("deleteRole/{id}")
+    Call<ApiResponse<Role>> deleteRole(
+            @Path("id") String id
     );
 
-    @POST("getAllLeaveHistory")
-    Call<ApiResponse<Leave>> getAllLeaveHistory(
-            @Header("api_key") String api_key
+    @POST("changeUserRole/{uid}")
+    Call<ApiResponse<Role>> changeUserRole(
+            @Path("uid") String uid,
+            @Body Role role
+    );
+
+    //-------------- Leave --------------
+
+    @GET("getLeaveType")
+    Call<ApiResponse<LeaveType>> getLeaveType();
+
+    @POST("addLeaveType")
+    Call<ApiResponse<LeaveType>> addLeaveType(
+            @Body LeaveType leaveType
+    );
+
+    @POST("updateLeaveType")
+    Call<ApiResponse<LeaveType>> updateLeaveType(
+            @Body LeaveType leaveType
+    );
+
+    @DELETE("deleteLeaveType/{id}")
+    Call<ApiResponse<LeaveType>> deleteLeaveType(
+            @Path("id") int id
+    );
+
+    @GET("getLeaveHistory/{uid}")
+    Call<ApiResponse<Leave>> getLeaveHistory(
+            @Path("uid") String uid
     );
 
     @POST("applyLeave")
-    Call<ApiResponse> applyLeave(
-            @Header("api_key") String api_key,
+    Call<ApiResponse<Leave>> applyLeave(
             @Body Leave leave
-
     );
 
-    @POST("changeLeaveStatus")
-    Call<ApiResponse> changeLeaveStatus(
-            @Header("api_key") String api_key,
-            @Query("id") int id,
-            @Query("status") int status
-
+    @POST("changeLeaveStatus/{uid}")
+    Call<ApiResponse<Leave>> changeLeaveStatus(
+            @Path("id") String uid,
+            @Body Leave leave
     );
 
     //---------------Department------------------
 
-    @POST("getAllDepartment")
-    Call<ApiResponse<Department>> getAllDepartment(
-            @Header("api_key") String api_key
-    );
+    @GET("getAllDepartment")
+    Call<ApiResponse<Department>> getAllDepartment();
 
-    @POST("createDepartment")
-    Call<ApiResponse> createDepartment(
-            @Header("api_key") String api_key,
-            @Query("name") String department_name
+    @POST("addDepartment")
+    Call<ApiResponse<Department>> addDepartment(
+            @Body Department department
     );
 
     @POST("updateDepartment")
-    Call<ApiResponse> updateDepartment(
-            @Header("api_key") String api_key,
-            @Query("id") int id,
-            @Query("name") String name
+    Call<ApiResponse<Department>> updateDepartment(
+            @Body Department department
     );
 
-    @POST("deleteDepartment")
-    Call<ApiResponse> deleteDepartment(
-            @Header("api_key") String api_key,
-            @Query("id") int id
+    @DELETE("deleteDepartment/{dpt_id}")
+    Call<ApiResponse<Department>> deleteDepartment(
+            @Path("dpt_id") int dpt_id
     );
 
     //---------------Designation------------------
 
-    @POST("getDesignation")
+    @GET("getDesignation/{dpt_id}")
     Call<ApiResponse<Designation>> getAllDesignation(
-            @Header("api_key") String api_key,
-            @Query("dpt_id") int dId);
+            @Path("dpt_id") int dpt_id);
 
-    @POST("createDesignation")
-    Call<ApiResponse> createDesignation(
-            @Header("api_key") String api_key,
-            @Query("dpt_id") int dpt_id,
-            @Query("name") String department_name
+    @POST("addDesignation")
+    Call<ApiResponse<Designation>> addDesignation(
+            @Body Designation designation
     );
 
     @POST("updateDesignation")
-    Call<ApiResponse> updateDesignation(
-            @Header("api_key") String api_key,
-            @Query("id") int id,
-            @Query("name") String name
+    Call<ApiResponse<Designation>> updateDesignation(
+            @Body Designation designation
     );
 
-    @POST("deleteDesignation")
-    Call<ApiResponse> deleteDesignation(
-            @Header("api_key") String api_key,
-            @Query("id") int id
+    @DELETE("deleteDesignation/{dg_id}/{dpt_id}")
+    Call<ApiResponse<Designation>> deleteDesignation(
+            @Path("dg_id") int dg_id,
+            @Path("dpt_id") int dpt_id
     );
 
     //----------------Attendance----------------
 
-    @POST("addAttendance")
+    @GET("addAttendance")
     Call<ApiResponse<Attendance>> addAttendance(
-            @Header("api_key") String api_key,
             @Query("uid") String uid,
             @Query("date") String date,
             @Query("time") String time,
@@ -185,59 +178,44 @@ public interface RetrofitInterface {
             @Query("status") int statusCode
     );
 
-    @POST("getAttendanceReportByDateRange")
+    @GET("getAttendanceReportByDateRange/{uid}")
     Call<ApiResponse<Attendance>> getAttendanceReportByDateRange(
-            @Header("api_key") String api_key,
+            @Path("uid") String uid,
             @Query("from_date") String fromDate,
             @Query("to_date") String toDate
     );
 
     //----------------holiday----------------
 
-    @POST("getAllHoliday")
-    Call<ApiResponse<Holiday>> getHolidayList(
-            @Header("api_key") String api_key
-    );
+    @GET("getAllHoliday")
+    Call<ApiResponse<Holiday>> getHolidayList();
 
-    @POST("addOrUpdateOrDeleteHoliday")
+    @POST("addHoliday")
     Call<ApiResponse<Holiday>> addHoliday(
-            @Header("api_key") String api_key,
-            @Query("name") String name,
-            @Query("date") String date,
-            @Query("status") int status
+            @Body Holiday holiday
     );
 
-    @POST("addOrUpdateOrDeleteHoliday")
+    @POST("updateHoliday")
     Call<ApiResponse<Holiday>> updateHoliday(
-            @Header("api_key") String api_key,
-            @Query("id") int id,
-            @Query("name") String uid,
-            @Query("date") String date,
-            @Query("status") int status
+            @Body Holiday holiday
     );
 
-    @POST("addOrUpdateOrDeleteHoliday")
+    @DELETE("deleteHoliday/{id}")
     Call<ApiResponse<Holiday>> deleteHoliday(
-            @Header("api_key") String api_key,
-            @Query("id") int id,
-            @Query("status") int status
+            @Path("id") int id
     );
 
-    @POST("checkIsAnyOffday")
-    Call<ApiResponse> checkIsAnyOffday(
-            @Header("api_key") String api_key
-    );
+    @GET("checkIsAnyOffday")
+    Call<ApiResponse> checkIsAnyOffday();
 
     //------------- OfficeTime -------------
 
     @GET("getOfficeTime")
-    Call<ApiResponse<OfficeTime>> getOfficeTime(
-            @Header("api_key") String api_key
-    );
+    Call<ApiResponse<OfficeTime>> getOfficeTime();
 
     @POST("updateOfficeTime")
-    Call<ApiResponse> updateOfficeTime(
-            @Header("api_key") String api_key,
+    Call<ApiResponse<OfficeTime>> updateOfficeTime(
             @Body OfficeTime officeTime
     );
+
 }

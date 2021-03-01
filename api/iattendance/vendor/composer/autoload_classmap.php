@@ -101,5 +101,7 @@ return array(
     'Slim\\Router' => $vendorDir . '/slim/slim/Slim/Router.php',
     'app\\Config\\Config' => $baseDir . '/app/Config/Config.php',
     'app\\Config\\DbConnect' => $baseDir . '/app/Config/DbConnect.php',
+    'app\\Controllers\\HomeController' => $baseDir . '/app/Controllers/HomeController.php',
     'app\\Helpers\\DbHelper' => $baseDir . '/app/Helpers/DbHelper.php',
+    'app\\Helpers\\Utils' => $baseDir . '/app/Helpers/Utils.php',
 );

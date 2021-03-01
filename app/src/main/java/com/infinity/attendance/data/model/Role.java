@@ -2,6 +2,7 @@ package com.infinity.attendance.data.model;
 
 public class Role {
     private int id;
+    private String uid;
     private String role_name;
     private int access_code;
 
@@ -11,6 +12,14 @@ public class Role {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getRole_name() {

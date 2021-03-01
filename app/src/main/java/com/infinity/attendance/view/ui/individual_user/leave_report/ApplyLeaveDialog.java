@@ -54,7 +54,7 @@ public class ApplyLeaveDialog extends DialogFragment {
     int cYear = c.get(Calendar.YEAR);
     int cMonth = c.get(Calendar.MONTH);
     int cDay = c.get(Calendar.DAY_OF_MONTH);
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<Leave>> onDataUpdateListener;
     private AlertDialog alert;
     private LeaveType selectedLeaveType;
     //
@@ -77,7 +77,7 @@ public class ApplyLeaveDialog extends DialogFragment {
         }
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<Leave>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -182,8 +182,8 @@ public class ApplyLeaveDialog extends DialogFragment {
                     @Override
                     public void onDialogItemClicked(LeaveType leaveType) {
                         selectedLeaveType = leaveType;
-                        Log.d(TAG, "onDialogItemClicked: " + selectedLeaveType.getType_id());
-                        Log.d(TAG, "onDialogItemClicked: " + leaveType.getType_id());
+                        Log.d(TAG, "onDialogItemClicked: " + selectedLeaveType.getId());
+                        Log.d(TAG, "onDialogItemClicked: " + leaveType.getId());
                         tv_leaveType.setText(leaveType.getName());
                         if (alert.isShowing()) {
                             alert.dismiss();
@@ -205,24 +205,28 @@ public class ApplyLeaveDialog extends DialogFragment {
                 if (isValid()) {
 
                     Leave leave = new Leave();
+                    leave.setUid(selectedUser.getUid());
                     leave.setApply_date(appyingDate.getText().toString());
                     leave.setPurpose(inputPurpose.getText().toString());
                     leave.setFrom_date(fromDate.getText().toString());
                     leave.setTo_date(toDate.getText().toString());
-                    leave.setType_id(selectedLeaveType.getType_id());
+                    leave.setType_id(selectedLeaveType.getId());
 
                     DataViewModel dataViewModel = new DataViewModel();
-                    dataViewModel.applyLeave(selectedUser.getApi_key(), leave).observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
-                        @Override
-                        public void onChanged(ApiResponse apiResponse) {
-                            if (apiResponse != null && !apiResponse.isError()) {
-                                ApplyLeaveDialog.this.dismiss();
-                                onDataUpdateListener.onSuccessfulDataUpdated();
-                            } else {
-                                Toast.makeText(getContext(), getContext().getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                    dataViewModel.applyLeave(leave).observe(getViewLifecycleOwner(),
+                            new Observer<ApiResponse<Leave>>() {
+                                @Override
+                                public void onChanged(ApiResponse<Leave> leaveApiResponse) {
+                                    if (leaveApiResponse != null) {
+                                        ApplyLeaveDialog.this.dismiss();
+                                        onDataUpdateListener.onSuccessfulDataUpdated(leaveApiResponse.getData());
+                                    } else {
+                                        Toast.makeText(getContext(), getContext().getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
                             }
-                        }
-                    });
+
+                    );
 
                 }
             }
@@ -256,7 +260,7 @@ public class ApplyLeaveDialog extends DialogFragment {
             return false;
         }
 
-        if (selectedLeaveType.getType_id() < 1) {
+        if (selectedLeaveType.getId() < 1) {
             Render render = new Render(getContext());
             render.setAnimation(Attention.Wobble(leaveTypeLayout));
             render.start();
@@ -269,11 +273,11 @@ public class ApplyLeaveDialog extends DialogFragment {
     private void getLeaveTypeList() {
 
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.getLeaveType(selectedUser.getApi_key()).observe(getViewLifecycleOwner(), new Observer<ApiResponse<LeaveType>>() {
+        dataViewModel.getLeaveType().observe(getViewLifecycleOwner(), new Observer<ApiResponse<LeaveType>>() {
             @Override
             public void onChanged(ApiResponse<LeaveType> leaveTypeApiResponse) {
-                if (leaveTypeApiResponse != null && !leaveTypeApiResponse.isError()) {
-                    leaveTypeList = leaveTypeApiResponse.getResults();
+                if (leaveTypeApiResponse != null) {
+                    leaveTypeList = leaveTypeApiResponse.getData();
                 } else {
                     Toast.makeText(getContext(), getContext().getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                 }

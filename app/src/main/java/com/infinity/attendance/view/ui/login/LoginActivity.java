@@ -66,8 +66,8 @@ public class LoginActivity extends AppCompatActivity {
                     dataViewModel.requestLogin("1", "123456").observe(LoginActivity.this, new Observer<ApiResponse<User>>() {
                         @Override
                         public void onChanged(ApiResponse<User> userApiResponse) {
-                            if (userApiResponse != null && !userApiResponse.isError()) {
-                                User user = userApiResponse.getResults().get(0);
+                            if (userApiResponse != null) {
+                                User user = userApiResponse.getData().get(0);
                                 //
                                 SharedPrefsHelper.setSuperUser(LoginActivity.this, user);
                                 //

@@ -1,7 +1,6 @@
 package com.infinity.attendance.view.ui.manage_leave.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.Leave;
-import com.infinity.attendance.data.model.User;
-import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.view.adapter.AdapterLeaveHistory;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
@@ -30,15 +26,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PendingLeaveFragment extends Fragment implements OnDataUpdateListener {
+public class PendingLeaveFragment extends Fragment {
 
     private static final String TAG = "LeaveFragment";
 
     private AdapterLeaveHistory adapter;
     private TextView emptyMsg;
+    //
+    private static final String LEAVE_TYPE = "LEAVE_TYPE";
+    private int leaveType;
 
     public PendingLeaveFragment() {
         // Required empty public constructor
+    }
+
+    public static PendingLeaveFragment newInstance(int leaveType) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(LEAVE_TYPE, leaveType);
+        PendingLeaveFragment fragment = new PendingLeaveFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            leaveType = getArguments().getInt(LEAVE_TYPE, 0);
+        }
     }
 
     @Override
@@ -52,8 +67,6 @@ public class PendingLeaveFragment extends Fragment implements OnDataUpdateListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.d(TAG, "onViewCreated: LeaveFragment");
-
         emptyMsg = view.findViewById(R.id.emptyMsg);
         RecyclerView recyclerView = view.findViewById(R.id.rvAllLeaveHistory);
         adapter = new AdapterLeaveHistory(getContext());
@@ -63,33 +76,22 @@ public class PendingLeaveFragment extends Fragment implements OnDataUpdateListen
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
 
-
     }
 
-    public void bindRv() {
-        //
-        final User superUser = SharedPrefsHelper.getSuperUser(getContext());
-        //
+    public void _getData() {
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getAllLeaveHistory(superUser.getApi_key()).observe(getViewLifecycleOwner(), new Observer<ApiResponse<Leave>>() {
+        dataViewModel.getLeaveHistory("").observe(getViewLifecycleOwner(), new Observer<ApiResponse<Leave>>() {
             @Override
             public void onChanged(ApiResponse<Leave> leaveApiResponse) {
                 if (leaveApiResponse != null && !leaveApiResponse.isError()) {
                     List<Leave> leaveList = new ArrayList<>();
-
                     for (Leave leave :
-                            leaveApiResponse.getResults()) {
-                        if (leave.getStatus() == 0) {
+                            leaveApiResponse.getData()) {
+                        if (leave.getStatus() == leaveType) {
                             leaveList.add(leave);
                         }
                     }
-
-                    adapter.updateLeaveList(leaveList);
-                    if (adapter.getItemCount() > 0) {
-                        emptyMsg.setVisibility(View.GONE);
-                    } else {
-                        emptyMsg.setVisibility(View.VISIBLE);
-                    }
+                    _updateAdapter(leaveList);
                 } else {
                     Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                 }
@@ -98,16 +100,18 @@ public class PendingLeaveFragment extends Fragment implements OnDataUpdateListen
 
     }
 
-
-    @Override
-    public void onSuccessfulDataUpdated() {
-        Toast.makeText(getContext(), "Successfully approved.", Toast.LENGTH_SHORT).show();
-        bindRv();
+    private void _updateAdapter(List<Leave> leaveList) {
+        adapter.updateLeaveList(leaveList);
+        if (adapter.getItemCount() > 0) {
+            emptyMsg.setVisibility(View.GONE);
+        } else {
+            emptyMsg.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        bindRv();
+        _getData();
     }
 }

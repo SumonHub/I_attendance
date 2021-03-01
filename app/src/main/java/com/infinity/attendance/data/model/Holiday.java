@@ -1,9 +1,6 @@
 package com.infinity.attendance.data.model;
 
 public class Holiday {
-    public static final int ADD = 1;
-    public static final int UPDATE = 2;
-    public static final int DELETE = 3;
     private int id;
     private String name, date;
 

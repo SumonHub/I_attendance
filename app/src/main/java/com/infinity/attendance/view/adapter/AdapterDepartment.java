@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +22,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.Department;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
-import com.infinity.attendance.view.ui.setting.department_setting.SettingDesignationActivity;
+import com.infinity.attendance.view.ui.setting.department.SettingDesignationActivity;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
@@ -36,14 +33,13 @@ import java.util.List;
 public class AdapterDepartment extends RecyclerView.Adapter<AdapterDepartment.DepartmentViewHolder> {
     private final Context context;
     private List<Department> departmentList = new ArrayList<>();
-    private OnDataUpdateListener onDataUpdateListener;
-
+    private OnDataUpdateListener<List<Department>> onDataUpdateListener;
 
     public AdapterDepartment(Context context) {
         this.context = context;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<Department>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -63,17 +59,13 @@ public class AdapterDepartment extends RecyclerView.Adapter<AdapterDepartment.De
     public void onBindViewHolder(@NonNull DepartmentViewHolder holder, int position) {
         Department department = departmentList.get(position);
         holder.textView.setText(department.getName());
-
         // update
         holder.btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("TAG", "onClick: ");
-                updateDepartment(department);
-                // onEditListener.onEdit(position);
+                _updateDepartmentDialog(department);
             }
         });
-
         // delete
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,7 +78,7 @@ public class AdapterDepartment extends RecyclerView.Adapter<AdapterDepartment.De
                         .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteDepartment(department.getId());
+                                _deleteDepartment(department);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -107,31 +99,9 @@ public class AdapterDepartment extends RecyclerView.Adapter<AdapterDepartment.De
                 context.startActivity(intent);
             }
         });
-
     }
 
-    private void deleteDepartment(int id) {
-        User superUser = SharedPrefsHelper.getSuperUser(context);
-        // set the custom layout
-
-        DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.deleteDepartment(superUser.getApi_key(), id).observe((LifecycleOwner) context, new Observer<ApiResponse>() {
-            @Override
-            public void onChanged(ApiResponse apiResponse) {
-                if (apiResponse != null && !apiResponse.isError()) {
-                    Toast.makeText(context, "Successfully deleted.", Toast.LENGTH_SHORT).show();
-                    onDataUpdateListener.onSuccessfulDataUpdated();
-                } else {
-                    Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-    }
-
-    private void updateDepartment(Department department) {
-        User superUser = SharedPrefsHelper.getSuperUser(context);
-        // set the custom layout
+    private void _updateDepartmentDialog(Department department) {
         final View customLayout = LayoutInflater.from(context).inflate(R.layout.dialog_add_dp_dg, null);
         TextView headline = customLayout.findViewById(R.id.headline);
         headline.setText("Update department");
@@ -150,25 +120,12 @@ public class AdapterDepartment extends RecyclerView.Adapter<AdapterDepartment.De
                 btnPositive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
                         if (TextUtils.isEmpty(inputText.getText())) {
                             inputText.setError("can't be empty");
                             return;
                         }
-
-                        DataViewModel dataViewModel = new DataViewModel();
-                        dataViewModel.updateDepartment(superUser.getApi_key(), department.getId(), inputText.getText().toString()).observe((LifecycleOwner) context, new Observer<ApiResponse>() {
-                            @Override
-                            public void onChanged(ApiResponse apiResponse) {
-                                if (apiResponse != null && !apiResponse.isError()) {
-                                    Toast.makeText(context, "Successfully deleted.", Toast.LENGTH_SHORT).show();
-                                    onDataUpdateListener.onSuccessfulDataUpdated();
-                                } else {
-                                    Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-
+                        department.setName(inputText.getText().toString());
+                        _updateDepartment(department);
                         alertDialog.dismiss();
                     }
                 });
@@ -178,6 +135,41 @@ public class AdapterDepartment extends RecyclerView.Adapter<AdapterDepartment.De
         alertDialog.show();
     }
 
+    private void _updateDepartment(Department department) {
+        DataViewModel dataViewModel = new DataViewModel();
+        dataViewModel.updateDepartment(department)
+                .observe((LifecycleOwner) context, new Observer<ApiResponse<Department>>() {
+                    @Override
+                    public void onChanged(ApiResponse<Department> departmentApiResponse) {
+                        if (departmentApiResponse != null) {
+                            Toast.makeText(context, "Successfully updated.", Toast.LENGTH_SHORT).show();
+                            if (onDataUpdateListener != null) {
+                                onDataUpdateListener.onSuccessfulDataUpdated(departmentApiResponse.getData());
+                            }
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void _deleteDepartment(Department department) {
+        DataViewModel dataViewModel = new DataViewModel();
+        dataViewModel.deleteDepartment(department.getId())
+                .observe((LifecycleOwner) context, new Observer<ApiResponse<Department>>() {
+                    @Override
+                    public void onChanged(ApiResponse<Department> departmentApiResponse) {
+                        if (departmentApiResponse != null) {
+                            Toast.makeText(context, "Successfully deleted.", Toast.LENGTH_SHORT).show();
+                            if (onDataUpdateListener != null) {
+                                onDataUpdateListener.onSuccessfulDataUpdated(departmentApiResponse.getData());
+                            }
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 
     @Override
     public int getItemCount() {

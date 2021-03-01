@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -41,10 +42,11 @@ public class SingleShotLocationProvider {
                 public void onLocationChanged(Location location) {
                     Log.d(TAG, "onLocationChanged: GPS_PROVIDER = " + location);
 
-                    try {
-                        callback.onNewLocationAvailable(location, convertToAddress(context, location));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if (location != null) {
+                        String address = convertToAddress(context, location);
+                        if (address != null) {
+                            callback.onNewLocationAvailable(location, address);
+                        }
                     }
                 }
             }, null);
@@ -59,14 +61,15 @@ public class SingleShotLocationProvider {
                     public void onLocationChanged(Location location) {
                         Log.d(TAG, "onLocationChanged: NETWORK_PROVIDER = " + location);
 
-                        try {
-                            callback.onNewLocationAvailable(location, convertToAddress(context, location));
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if (location != null) {
+                            String address = convertToAddress(context, location);
+                            if (address != null) {
+                                callback.onNewLocationAvailable(location, address);
+                            }
                         }
                     }
 
-                }, null);
+                }, Looper.myLooper());
             }
         }
     }
@@ -75,30 +78,28 @@ public class SingleShotLocationProvider {
     // contents of the else and if. Also be sure to check gps permission/settings are allowed.
     // call usually takes <10ms
 
-    public String convertToAddress(Context context, Location location) throws IOException {
-        if (location == null) {
+    public String convertToAddress(Context context, Location location) {
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            String address = addresses.get(0).getAddressLine(0);
+            String city = addresses.get(0).getLocality();
+            String state = addresses.get(0).getAdminArea();
+            String country = addresses.get(0).getCountryName();
+            String postalCode = addresses.get(0).getPostalCode();
+            String knownName = addresses.get(0).getFeatureName();
+            return address;
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-
-        List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-
-        String address = addresses.get(0).getAddressLine(0);
-        String city = addresses.get(0).getLocality();
-        String state = addresses.get(0).getAdminArea();
-        String country = addresses.get(0).getCountryName();
-        String postalCode = addresses.get(0).getPostalCode();
-        String knownName = addresses.get(0).getFeatureName();
-
-        return address;
-
     }
 
     public boolean isCanGetLocation() {
         final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
         return isGPSEnabled || isNetworkEnabled;
     }
 
@@ -108,15 +109,8 @@ public class SingleShotLocationProvider {
      */
     public void showGpsSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-
-        // Setting DialogHelp Title
         alertDialog.setTitle("GPS is settings");
-
-        // Setting DialogHelp Message
-        alertDialog
-                .setMessage("GPS is not enabled. Do you want to go to settings menu?");
-
-        // On pressing Settings button
+        alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
         alertDialog.setPositiveButton("Settings",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -124,16 +118,12 @@ public class SingleShotLocationProvider {
                         context.startActivity(intent);
                     }
                 });
-
-        // on pressing cancel button
         alertDialog.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
-
-        // Showing Alert Message
         alertDialog.show();
     }
 

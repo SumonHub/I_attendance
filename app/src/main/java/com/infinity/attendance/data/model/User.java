@@ -3,7 +3,7 @@ package com.infinity.attendance.data.model;
 public class User {
 
     private String uid, name, password, email, phone, dg_name, dpt_name,
-            joining_date, blood_group, role_name, api_key;
+            joining_date, blood_group, role_name;
     private String encoded_cv;
 
     private int dg_id, dpt_id, role_id;
@@ -122,14 +122,6 @@ public class User {
         this.role_name = role_name;
     }
 
-    public String getApi_key() {
-        return api_key;
-    }
-
-    public void setApi_key(String api_key) {
-        this.api_key = api_key;
-    }
-
     public int getAccess_code() {
         return access_code;
     }
@@ -159,7 +151,6 @@ public class User {
                 ", joining_date='" + joining_date + '\'' +
                 ", blood_group='" + blood_group + '\'' +
                 ", role_name='" + role_name + '\'' +
-                ", api_key='" + api_key + '\'' +
                 ", encoded_cv='" + encoded_cv + '\'' +
                 ", dg_id=" + dg_id +
                 ", dpt_id=" + dpt_id +

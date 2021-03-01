@@ -159,7 +159,9 @@ class ComposerStaticInit0bf4b50faab470cd3965ab9687401a48
         'Slim\\Router' => __DIR__ . '/..' . '/slim/slim/Slim/Router.php',
         'app\\Config\\Config' => __DIR__ . '/../..' . '/app/Config/Config.php',
         'app\\Config\\DbConnect' => __DIR__ . '/../..' . '/app/Config/DbConnect.php',
+        'app\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Controllers/HomeController.php',
         'app\\Helpers\\DbHelper' => __DIR__ . '/../..' . '/app/Helpers/DbHelper.php',
+        'app\\Helpers\\Utils' => __DIR__ . '/../..' . '/app/Helpers/Utils.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

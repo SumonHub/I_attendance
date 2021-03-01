@@ -21,9 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.Designation;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
@@ -33,13 +31,13 @@ import java.util.List;
 public class AdapterDesignation extends RecyclerView.Adapter<AdapterDesignation.DepartmentViewHolder> {
     private final Context context;
     private List<Designation> designationList = new ArrayList<>();
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<Designation>> onDataUpdateListener;
 
     public AdapterDesignation(Context context) {
         this.context = context;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<Designation>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -63,7 +61,7 @@ public class AdapterDesignation extends RecyclerView.Adapter<AdapterDesignation.
         holder.btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateDesignation(designation);
+                _updateDesignationDialog(designation);
             }
         });
 
@@ -78,7 +76,7 @@ public class AdapterDesignation extends RecyclerView.Adapter<AdapterDesignation.
                         .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteDesignation(designation.getId());
+                                deleteDesignation(designation);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -93,26 +91,25 @@ public class AdapterDesignation extends RecyclerView.Adapter<AdapterDesignation.
 
     }
 
-    private void deleteDesignation(int id) {
-        User superUser = SharedPrefsHelper.getSuperUser(context);
-        // set the custom layout
+    private void deleteDesignation(Designation designation) {
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.deleteDesignation(superUser.getApi_key(), id).observe((LifecycleOwner) context, new Observer<ApiResponse>() {
-            @Override
-            public void onChanged(ApiResponse apiResponse) {
-                if (apiResponse != null && !apiResponse.isError()) {
-                    Toast.makeText(context, "Successfully deleted.", Toast.LENGTH_SHORT).show();
-                    onDataUpdateListener.onSuccessfulDataUpdated();
-                } else {
-                    Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        dataViewModel.deleteDesignation(designation.getId(), designation.getDpt_id())
+                .observe((LifecycleOwner) context, new Observer<ApiResponse<Designation>>() {
+                    @Override
+                    public void onChanged(ApiResponse<Designation> designationApiResponse) {
+                        if (designationApiResponse != null && !designationApiResponse.isError()) {
+                            Toast.makeText(context, "Successfully deleted.", Toast.LENGTH_SHORT).show();
+                            if (onDataUpdateListener != null) {
+                                onDataUpdateListener.onSuccessfulDataUpdated(designationApiResponse.getData());
+                            }
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
-    private void updateDesignation(Designation designation) {
-        User superUser = SharedPrefsHelper.getSuperUser(context);
-        // set the custom layout
+    private void _updateDesignationDialog(Designation designation) {
         final View customLayout = LayoutInflater.from(context).inflate(R.layout.dialog_add_dp_dg, null);
         TextView headline = customLayout.findViewById(R.id.headline);
         headline.setText("Update designation");
@@ -136,20 +133,8 @@ public class AdapterDesignation extends RecyclerView.Adapter<AdapterDesignation.
                             inputText.setError("can't be empty");
                             return;
                         }
-
-                        DataViewModel dataViewModel = new DataViewModel();
-                        dataViewModel.updateDesignation(superUser.getApi_key(), designation.getId(), inputText.getText().toString()).observe((LifecycleOwner) context, new Observer<ApiResponse>() {
-                            @Override
-                            public void onChanged(ApiResponse apiResponse) {
-                                if (apiResponse != null && !apiResponse.isError()) {
-                                    Toast.makeText(context, "Successfully deleted.", Toast.LENGTH_SHORT).show();
-                                    onDataUpdateListener.onSuccessfulDataUpdated();
-                                } else {
-                                    Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-
+                        designation.setName(inputText.getText().toString());
+                        _updateDesignation(designation);
                         alertDialog.dismiss();
                     }
                 });
@@ -157,6 +142,22 @@ public class AdapterDesignation extends RecyclerView.Adapter<AdapterDesignation.
         });
 
         alertDialog.show();
+    }
+
+    private void _updateDesignation(Designation designation) {
+        DataViewModel dataViewModel = new DataViewModel();
+        dataViewModel.updateDesignation(designation)
+                .observe((LifecycleOwner) context, new Observer<ApiResponse<Designation>>() {
+                    @Override
+                    public void onChanged(ApiResponse<Designation> designationApiResponse) {
+                        if (designationApiResponse != null && !designationApiResponse.isError()) {
+                            Toast.makeText(context, "Successfully updated.", Toast.LENGTH_SHORT).show();
+                            onDataUpdateListener.onSuccessfulDataUpdated(designationApiResponse.getData());
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     @Override

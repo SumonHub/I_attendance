@@ -29,18 +29,19 @@ public class AdapterRole extends RecyclerView.Adapter<AdapterRole.RoleViewHolder
     private static final String TAG = "AdapterRole";
     private final Context context;
     private List<Role> roleList = new ArrayList<>();
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<Role>> onDataUpdateListener;
 
     public AdapterRole(Context context) {
         this.context = context;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<Role>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
     public void setRoleList(List<Role> roleList) {
         this.roleList = roleList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -90,10 +91,10 @@ public class AdapterRole extends RecyclerView.Adapter<AdapterRole.RoleViewHolder
                 AddRoleDialog addRoleDialog = AddRoleDialog.newInstance(bundle);
                 FragmentTransaction ft = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
                 addRoleDialog.show(ft, AddRoleDialog.TAG);
-                addRoleDialog.setOnDataUpdateListener(new OnDataUpdateListener() {
+                addRoleDialog.setOnDataUpdateListener(new OnDataUpdateListener<List<Role>>() {
                     @Override
-                    public void onSuccessfulDataUpdated() {
-                        onDataUpdateListener.onSuccessfulDataUpdated();
+                    public void onSuccessfulDataUpdated(List<Role> object) {
+                        Toast.makeText(context, "update", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -110,7 +111,7 @@ public class AdapterRole extends RecyclerView.Adapter<AdapterRole.RoleViewHolder
                         .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteRole(role.getId());
+                                _deleteRole(role.getId());
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -124,7 +125,7 @@ public class AdapterRole extends RecyclerView.Adapter<AdapterRole.RoleViewHolder
         });
     }
 
-    private void deleteRole(int roleId) {
+    private void _deleteRole(int roleId) {
         Toast.makeText(context, "Under construction.", Toast.LENGTH_SHORT).show();
     }
 

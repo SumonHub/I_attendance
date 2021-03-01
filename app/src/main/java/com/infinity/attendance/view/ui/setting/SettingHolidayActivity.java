@@ -5,9 +5,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,9 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.Holiday;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.utils.Utils;
 import com.infinity.attendance.view.adapter.AdapterHoliday;
 import com.infinity.attendance.viewmodel.DataViewModel;
@@ -46,10 +44,8 @@ public class SettingHolidayActivity extends AppCompatActivity {
     int cYear = c.get(Calendar.YEAR);
     int cMonth = c.get(Calendar.MONTH);
     int cDay = c.get(Calendar.DAY_OF_MONTH);
-    private TextView emptyMsg;
     private AdapterHoliday adapter;
-    private List<Holiday> holidayList;
-    private User superUser;
+    //private List<Holiday> holidayList;
     private Date selectedDate;
     //
 
@@ -67,17 +63,13 @@ public class SettingHolidayActivity extends AppCompatActivity {
         });
         //
         Utils.showDialogWaiting(this);
-        // shared pref
-        superUser = SharedPrefsHelper.getSuperUser(this);
-        //
 
-        emptyMsg = findViewById(R.id.emptyMsg);
         RecyclerView rvLeaveHistory = findViewById(R.id.rvHoliday);
         adapter = new AdapterHoliday(this);
-        adapter.setOnDataUpdateListener(new OnDataUpdateListener() {
+        adapter.setOnDataUpdateListener(new OnDataUpdateListener<List<Holiday>>() {
             @Override
-            public void onSuccessfulDataUpdated() {
-                bindRv();
+            public void onSuccessfulDataUpdated(List<Holiday> object) {
+                _updateAdapter(object);
             }
         });
 
@@ -86,7 +78,7 @@ public class SettingHolidayActivity extends AppCompatActivity {
         rvLeaveHistory.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         rvLeaveHistory.setAdapter(adapter);
         //
-        bindRv();
+        _getData();
         //
 
         FloatingActionButton fabAddHoliday = findViewById(R.id.fabAddHoliday);
@@ -103,8 +95,8 @@ public class SettingHolidayActivity extends AppCompatActivity {
 
         // set the custom layout
         final View customLayout = getLayoutInflater().inflate(R.layout.dialog_add_holiday, null);
-        EditText editText = customLayout.findViewById(R.id.inputText);
-        TextInputEditText datePicker = customLayout.findViewById(R.id.datePicker);
+        TextInputEditText inputName = customLayout.findViewById(R.id.inputName);
+        AutoCompleteTextView datePicker = customLayout.findViewById(R.id.datePicker);
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -116,9 +108,7 @@ public class SettingHolidayActivity extends AppCompatActivity {
                                                   int monthOfYear, int dayOfMonth) {
                                 Calendar calendar = Calendar.getInstance();
                                 calendar.set(year, monthOfYear, dayOfMonth);
-
                                 selectedDate = calendar.getTime();
-
                                 datePicker.setText(new SimpleDateFormat("yyyy-MMMM-dd", Locale.ENGLISH).format(selectedDate));
                             }
                         }, cYear, cMonth, cDay).show();
@@ -138,22 +128,26 @@ public class SettingHolidayActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
-                        if (TextUtils.isEmpty(editText.getText()) || selectedDate == null) {
-                            editText.setError("can't be empty");
+                        if (TextUtils.isEmpty(inputName.getText()) || selectedDate == null) {
+                            inputName.setError("can't be empty");
                             datePicker.setError("can't be empty");
                             return;
                         }
 
                         String selectedDateStr = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(selectedDate);
 
+                        Holiday holiday = new Holiday();
+                        holiday.setName(inputName.getText().toString());
+                        holiday.setDate(selectedDateStr);
+
                         DataViewModel dataViewModel = new DataViewModel();
-                        dataViewModel.addHoliday(superUser.getApi_key(), editText.getText().toString(), selectedDateStr, Holiday.ADD)
+                        dataViewModel.addHoliday(holiday)
                                 .observe(SettingHolidayActivity.this, new Observer<ApiResponse<Holiday>>() {
                                     @Override
                                     public void onChanged(ApiResponse<Holiday> holidayApiResponse) {
                                         if (holidayApiResponse != null && !holidayApiResponse.isError()) {
                                             Toast.makeText(SettingHolidayActivity.this, "Successfully created.", Toast.LENGTH_SHORT).show();
-                                            bindRv();
+                                            _updateAdapter(holidayApiResponse.getData());
                                         } else {
                                             Toast.makeText(SettingHolidayActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                                         }
@@ -168,22 +162,26 @@ public class SettingHolidayActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void bindRv() {
+    private void _getData() {
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getHolidayList(superUser.getApi_key()).observe(this,
+        dataViewModel.getHoliday().observe(this,
                 new Observer<ApiResponse<Holiday>>() {
                     @Override
                     public void onChanged(ApiResponse<Holiday> holidayApiResponse) {
-                        if (holidayApiResponse != null && !holidayApiResponse.isError()) {
-                            holidayList = holidayApiResponse.getResults();
-                            adapter.setHolidayList(holidayList);
-                            if (adapter.getItemCount() > 0) {
-                                emptyMsg.setVisibility(View.GONE);
-                            } else {
-                                emptyMsg.setVisibility(View.VISIBLE);
-                            }
+                        if (holidayApiResponse != null) {
+                            _updateAdapter(holidayApiResponse.getData());
                         }
                     }
                 });
+    }
+
+    private void _updateAdapter(List<Holiday> holidayList) {
+        TextView emptyMsg = findViewById(R.id.emptyMsg);
+        adapter.setHolidayList(holidayList);
+        if (adapter.getItemCount() > 0) {
+            emptyMsg.setVisibility(View.GONE);
+        } else {
+            emptyMsg.setVisibility(View.VISIBLE);
+        }
     }
 }

@@ -10,7 +10,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.infinity.attendance.R;
 import com.infinity.attendance.utils.Utils;
-import com.infinity.attendance.view.ui.setting.department_setting.SettingDepartmentActivity;
+import com.infinity.attendance.view.ui.setting.department.SettingDepartmentActivity;
 import com.infinity.attendance.view.ui.setting.leave_type.SettingLeaveActivity;
 import com.infinity.attendance.view.ui.setting.office_time.SettingOfficeTimeActivity;
 import com.infinity.attendance.view.ui.setting.role.SettingRoleActivity;

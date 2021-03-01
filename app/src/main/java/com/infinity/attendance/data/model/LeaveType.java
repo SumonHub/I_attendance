@@ -1,19 +1,16 @@
 package com.infinity.attendance.data.model;
 
 public class LeaveType {
-    public static final int ADD = 1;
-    public static final int UPDATE = 2;
-    public static final int DELETE = 3;
 
-    private int type_id;
+    private int id;
     private String name, balance;
 
-    public int getType_id() {
-        return type_id;
+    public int getId() {
+        return id;
     }
 
-    public void setType_id(int type_id) {
-        this.type_id = type_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -35,7 +32,7 @@ public class LeaveType {
     @Override
     public String toString() {
         return "LeaveType{" +
-                "id=" + type_id +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", balance='" + balance + '\'' +
                 '}';

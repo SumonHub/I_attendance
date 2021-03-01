@@ -87,12 +87,12 @@ public class AttendanceActivity extends AppCompatActivity implements AttendanceF
     private void bindRv() {
 
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.getAttendanceReportByDateRange(selectedUser.getApi_key(), startDate, endDate).observe(this, new Observer<ApiResponse<Attendance>>() {
+        dataViewModel.getAttendanceReportByDateRange(selectedUser.getUid(), startDate, endDate).observe(this, new Observer<ApiResponse<Attendance>>() {
             @Override
             public void onChanged(ApiResponse<Attendance> attendanceApiResponse) {
-                if (attendanceApiResponse != null && !attendanceApiResponse.isError()) {
+                if (attendanceApiResponse != null) {
                     dateRange.setText(startDate + " to " + endDate);
-                    attendanceAdapter.addList(attendanceApiResponse.getResults());
+                    attendanceAdapter.addList(attendanceApiResponse.getData());
                     if (attendanceAdapter.getItemCount() > 0) {
                         emptyMsg.setVisibility(View.GONE);
                     } else {

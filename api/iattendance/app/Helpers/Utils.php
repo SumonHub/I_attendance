@@ -5,11 +5,11 @@ namespace app\Helpers;
 class Utils
 {
 
-    public static function getResponse(array $data)
+    public static function getResponse($data)
     {
         return array(
-            'error' => empty($data),
-            'msg' => empty($data) ? 'Opps! An error occurred' : 'Get data succesfully',
+            'error' => is_null($data),
+            'msg' => is_null($data) ? 'Opps! an error occurred!' : 'Get data succesfully',
             'data' => $data
         );
     }

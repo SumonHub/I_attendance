@@ -14,17 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.OfficeTime;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.utils.Utils;
 import com.infinity.attendance.view.adapter.AdapterOfficeTime;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
-public class SettingOfficeTimeActivity extends AppCompatActivity implements OnDataUpdateListener {
+import java.util.List;
+
+public class SettingOfficeTimeActivity extends AppCompatActivity {
     private AdapterOfficeTime adapterOfficeTime;
-    private User superUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,38 +39,36 @@ public class SettingOfficeTimeActivity extends AppCompatActivity implements OnDa
                 onBackPressed();
             }
         });
-        //
-        superUser = SharedPrefsHelper.getSuperUser(this);
-
-        RecyclerView rvOfficeTimeHolder = findViewById(R.id.rvOfficeTimeHolder);
 
         adapterOfficeTime = new AdapterOfficeTime(this);
-        adapterOfficeTime.setOnDataUpdateListener(this);
+        adapterOfficeTime.setOnDataUpdateListener(new OnDataUpdateListener<List<OfficeTime>>() {
+            @Override
+            public void onSuccessfulDataUpdated(List<OfficeTime> object) {
+                adapterOfficeTime.setOfficeTimeList(object);
+            }
+        });
 
+        RecyclerView rvOfficeTimeHolder = findViewById(R.id.rvOfficeTimeHolder);
         rvOfficeTimeHolder.setHasFixedSize(true);
         rvOfficeTimeHolder.setLayoutManager(new LinearLayoutManager(this));
         rvOfficeTimeHolder.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         rvOfficeTimeHolder.setAdapter(adapterOfficeTime);
-        bindRv();
+
+        _getData();
 
     }
 
-    private void bindRv() {
+    private void _getData() {
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getOfficeTimeLiveData(superUser.getApi_key()).observe(this, new Observer<ApiResponse<OfficeTime>>() {
+        dataViewModel.getOfficeTimeLiveData().observe(this, new Observer<ApiResponse<OfficeTime>>() {
             @Override
             public void onChanged(ApiResponse<OfficeTime> officeTimeApiResponse) {
                 if (officeTimeApiResponse != null && !officeTimeApiResponse.isError()) {
-                    adapterOfficeTime.setOfficeTimeList(officeTimeApiResponse.getResults());
+                    adapterOfficeTime.setOfficeTimeList(officeTimeApiResponse.getData());
                 } else {
                     Toast.makeText(SettingOfficeTimeActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-    }
-
-    @Override
-    public void onSuccessfulDataUpdated() {
-        bindRv();
     }
 }

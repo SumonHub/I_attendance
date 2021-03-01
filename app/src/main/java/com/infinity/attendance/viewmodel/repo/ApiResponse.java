@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApiResponse<T> {
-    boolean error;
-    String msg;
-    List<T> results = new ArrayList<>();
+    private boolean error;
+    private String msg;
+    private List<T> data = new ArrayList<>();
 
     public boolean isError() {
         return error;
@@ -24,12 +24,12 @@ public class ApiResponse<T> {
         this.msg = msg;
     }
 
-    public List<T> getResults() {
-        return results;
+    public List<T> getData() {
+        return data;
     }
 
-    public void setResults(List<T> results) {
-        this.results = results;
+    public void setData(List<T> data) {
+        this.data = data;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ApiResponse<T> {
         return "ApiResponse{" +
                 "error=" + error +
                 ", msg='" + msg + '\'' +
-                ", results=" + results +
+                ", data=" + data +
                 '}';
     }
 }

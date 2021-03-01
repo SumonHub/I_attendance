@@ -23,6 +23,8 @@ import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
+import java.util.List;
+
 
 public class LeaveStatusChangeDialog extends DialogFragment {
 
@@ -33,7 +35,7 @@ public class LeaveStatusChangeDialog extends DialogFragment {
 
     private Leave selectedLeave;
 
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<Leave>> onDataUpdateListener;
 
     public LeaveStatusChangeDialog() {
         // Required empty public constructor
@@ -45,7 +47,7 @@ public class LeaveStatusChangeDialog extends DialogFragment {
         return fragment;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<Leave>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -97,29 +99,31 @@ public class LeaveStatusChangeDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 // TODO: 9/14/2020 api call
-                changeLeaveStatus(1);
+                selectedLeave.setStatus(Leave.APPROVED);
+                changeLeaveStatus();
             }
         });
 
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeLeaveStatus(2);
+                selectedLeave.setStatus(Leave.DECLINED);
+                changeLeaveStatus();
             }
         });
 
 
     }
 
-    private void changeLeaveStatus(int status) {
+    private void changeLeaveStatus() {
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.changeLeaveStatus(SharedPrefsHelper.getSuperUser(getContext()).getApi_key(),
-                selectedLeave.getId(),
-                status).observe(getViewLifecycleOwner(), new Observer<ApiResponse<Leave>>() {
+        dataViewModel.changeLeaveStatus(SharedPrefsHelper.getSuperUser(getContext()).getUid(), selectedLeave).observe(getViewLifecycleOwner(), new Observer<ApiResponse<Leave>>() {
             @Override
             public void onChanged(ApiResponse<Leave> leaveApiResponse) {
-                if (leaveApiResponse != null && !leaveApiResponse.isError()) {
-                    onDataUpdateListener.onSuccessfulDataUpdated();
+                if (leaveApiResponse != null) {
+                    if (onDataUpdateListener != null) {
+                        onDataUpdateListener.onSuccessfulDataUpdated(leaveApiResponse.getData());
+                    }
                     LeaveStatusChangeDialog.this.dismiss();
                 } else {
                     Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();

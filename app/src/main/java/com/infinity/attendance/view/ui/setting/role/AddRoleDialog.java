@@ -25,6 +25,8 @@ import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
+import java.util.List;
+
 public class AddRoleDialog extends DialogFragment {
     public static final String TAG = "AddRoleDialog";
     public static final String SELECTED_ROLE = "SELECTED_ROLE";
@@ -40,7 +42,7 @@ public class AddRoleDialog extends DialogFragment {
     private String rollTitle;
     private StringBuilder accessCode;
 
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<Role>> onDataUpdateListener;
 
     public AddRoleDialog() {
     }
@@ -52,7 +54,7 @@ public class AddRoleDialog extends DialogFragment {
         return fragment;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<Role>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -122,39 +124,40 @@ public class AddRoleDialog extends DialogFragment {
             public void onClick(View view) {
                 if (isValid()) {
 
+                    User user = SharedPrefsHelper.getSuperUser(getContext());
                     Role newRole = new Role();
+                    newRole.setUid(user.getUid());
 
                     if (moodUpdate) {
                         newRole.setId(selectedRole.getId());
                         newRole.setRole_name(rollTitle);
                         newRole.setAccess_code(Integer.parseInt(accessCode.toString()));
+                        //
+                        _updateRole(newRole);
                     } else {
                         newRole.setRole_name(rollTitle);
                         newRole.setAccess_code(Integer.parseInt(accessCode.toString()));
+                        //
+                        _createRole(newRole);
                     }
-
-                    Log.d(TAG, "newRole: " + newRole);
-
-                    createOrUpdateUserRole(newRole);
                 }
             }
         });
     }
 
-    private void createOrUpdateUserRole(Role newRole) {
+    private void _updateRole(Role newRole) {
 
-        User user = SharedPrefsHelper.getSuperUser(getContext());
-        //
-        Log.d(TAG, "createOrUpdateUserRole: " + newRole);
+    }
 
+    private void _createRole(Role newRole) {
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.createOrUpdateUserRole(user.getApi_key(), newRole)
-                .observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
+        dataViewModel.addRole(newRole)
+                .observe(getViewLifecycleOwner(), new Observer<ApiResponse<Role>>() {
                     @Override
-                    public void onChanged(ApiResponse apiResponse) {
-                        if (apiResponse != null && !apiResponse.isError()) {
+                    public void onChanged(ApiResponse<Role> roleApiResponse) {
+                        if (roleApiResponse != null && !roleApiResponse.isError()) {
                             Toast.makeText(getContext(), "Successfully Add user role.", Toast.LENGTH_SHORT).show();
-                            onDataUpdateListener.onSuccessfulDataUpdated();
+                            onDataUpdateListener.onSuccessfulDataUpdated(roleApiResponse.getData());
                             AddRoleDialog.this.dismiss();
                         } else {
                             Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();

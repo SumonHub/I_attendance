@@ -19,8 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.Leave;
-import com.infinity.attendance.data.model.User;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.view.adapter.AdapterLeaveHistory;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
@@ -63,38 +61,39 @@ public class ApprovedLeaveFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
 
-        //    bindRv();
+        bindRv();
     }
 
     public void bindRv() {
-        //
-        final User superUser = SharedPrefsHelper.getSuperUser(getContext());
-        //
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getAllLeaveHistory(superUser.getApi_key()).observe(getViewLifecycleOwner(), new Observer<ApiResponse<Leave>>() {
+        dataViewModel.getLeaveHistory("").observe(getViewLifecycleOwner(), new Observer<ApiResponse<Leave>>() {
             @Override
             public void onChanged(ApiResponse<Leave> leaveApiResponse) {
                 if (leaveApiResponse != null && !leaveApiResponse.isError()) {
                     List<Leave> leaveList = new ArrayList<>();
 
                     for (Leave leave :
-                            leaveApiResponse.getResults()) {
+                            leaveApiResponse.getData()) {
                         if (leave.getStatus() == 1) {
                             leaveList.add(leave);
                         }
                     }
 
-                    adapter.updateLeaveList(leaveList);
-                    if (adapter.getItemCount() > 0) {
-                        emptyMsg.setVisibility(View.GONE);
-                    } else {
-                        emptyMsg.setVisibility(View.VISIBLE);
-                    }
+                    _updateAdapter(leaveList);
                 } else {
                     Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private void _updateAdapter(List<Leave> leaveList) {
+        adapter.updateLeaveList(leaveList);
+        if (adapter.getItemCount() > 0) {
+            emptyMsg.setVisibility(View.GONE);
+        } else {
+            emptyMsg.setVisibility(View.VISIBLE);
+        }
     }
 
 

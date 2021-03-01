@@ -114,13 +114,13 @@ public class ContactDetailsFragment extends Fragment {
                     _buildSelectedUserInfo();
 
                     DataViewModel dataViewModel = new DataViewModel();
-                    dataViewModel.addUserInfo(selectedUser.getApi_key(), selectedUserInfo).observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
-                        @Override
-                        public void onChanged(ApiResponse apiResponse) {
-                            Toast.makeText(getContext(), apiResponse.getMsg(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
+                    dataViewModel.addUserInfo(selectedUser.getUid(), selectedUserInfo)
+                            .observe(getViewLifecycleOwner(), new Observer<ApiResponse<UserInfo>>() {
+                                @Override
+                                public void onChanged(ApiResponse<UserInfo> userInfoApiResponse) {
+                                    Toast.makeText(getContext(), userInfoApiResponse.getMsg(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 }
 
             }
@@ -130,12 +130,12 @@ public class ContactDetailsFragment extends Fragment {
     private void bindData() {
 
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getUserInfoByKeyLiveData(selectedUser.getApi_key()).observe(getViewLifecycleOwner(),
+        dataViewModel.getUserInfoLiveData(selectedUser.getUid()).observe(getViewLifecycleOwner(),
                 new Observer<ApiResponse<UserInfo>>() {
                     @Override
                     public void onChanged(ApiResponse<UserInfo> userInfoApiResponse) {
-                        if (userInfoApiResponse != null && !userInfoApiResponse.isError()) {
-                            UserInfo userInfo = userInfoApiResponse.getResults().get(0);
+                        if (userInfoApiResponse != null) {
+                            UserInfo userInfo = userInfoApiResponse.getData().get(0);
                             selectedUserInfo = userInfo;
                             inputCurrentAddress.setText(userInfo.getC_address());
                             inputPermanentAddress.setText(userInfo.getP_address());

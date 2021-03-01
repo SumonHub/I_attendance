@@ -3,7 +3,6 @@ package com.infinity.attendance.view.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.LeaveType;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.view.ui.setting.leave_type.AddLeaveTypeDialog;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
@@ -36,13 +33,13 @@ public class AdapterLeaveType extends RecyclerView.Adapter<AdapterLeaveType.Leav
     private static final String TAG = "AdapterLeaveType";
     private final Context context;
     private List<LeaveType> leaveTypeList = new ArrayList<>();
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<LeaveType>> onDataUpdateListener;
 
     public AdapterLeaveType(Context context) {
         this.context = context;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<LeaveType>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -67,7 +64,7 @@ public class AdapterLeaveType extends RecyclerView.Adapter<AdapterLeaveType.Leav
         holder.update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateLeaveType(leaveType);
+                _updateLeaveTypeDialog(leaveType);
             }
         });
 
@@ -79,10 +76,10 @@ public class AdapterLeaveType extends RecyclerView.Adapter<AdapterLeaveType.Leav
                         .setIcon(R.drawable.ic_stop_hand_64)
                         .setTitle("Warning")
                         .setMessage("Are your sure to delete? It may causes for data corruption. ")
-                        .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                deleteLeaveType(leaveType);
+                                _deleteLeaveType(leaveType);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -98,17 +95,16 @@ public class AdapterLeaveType extends RecyclerView.Adapter<AdapterLeaveType.Leav
 
     }
 
-    private void deleteLeaveType(LeaveType leaveType) {
-        Log.d(TAG, "deleteLeaveType: " + leaveType);
-        User superuser = SharedPrefsHelper.getSuperUser(context);
-
+    private void _deleteLeaveType(LeaveType leaveType) {
         DataViewModel dataViewModel = new DataViewModel();
-        dataViewModel.actionLeaveType(superuser.getApi_key(), leaveType, LeaveType.DELETE).observe((LifecycleOwner) this, new Observer<ApiResponse>() {
+        dataViewModel.deleteLeave(leaveType.getId()).observe((LifecycleOwner) context, new Observer<ApiResponse<LeaveType>>() {
             @Override
-            public void onChanged(ApiResponse apiResponse) {
-                if (apiResponse != null && !apiResponse.isError()) {
+            public void onChanged(ApiResponse<LeaveType> listApiResponse) {
+                if (listApiResponse != null && !listApiResponse.isError()) {
                     Toast.makeText(context, "Successfully deleted.", Toast.LENGTH_SHORT).show();
-                    onDataUpdateListener.onSuccessfulDataUpdated();
+                    if (onDataUpdateListener != null) {
+                        onDataUpdateListener.onSuccessfulDataUpdated(listApiResponse.getData());
+                    }
                 } else {
                     Toast.makeText(context, context.getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
                 }
@@ -116,19 +112,20 @@ public class AdapterLeaveType extends RecyclerView.Adapter<AdapterLeaveType.Leav
         });
     }
 
-    private void updateLeaveType(LeaveType leaveType) {
+    private void _updateLeaveTypeDialog(LeaveType leaveType) {
         Bundle bundle = new Bundle();
         bundle.putString(AddLeaveTypeDialog.SELECTED_LEAVE_TYPE, new Gson().toJson(leaveType));
         AddLeaveTypeDialog dialog = AddLeaveTypeDialog.newInstance(bundle);
         FragmentTransaction ft = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
         dialog.show(ft, AddLeaveTypeDialog.TAG);
-        dialog.setOnDataUpdateListener(new OnDataUpdateListener() {
+        dialog.setOnDataUpdateListener(new OnDataUpdateListener<List<LeaveType>>() {
             @Override
-            public void onSuccessfulDataUpdated() {
-                onDataUpdateListener.onSuccessfulDataUpdated();
+            public void onSuccessfulDataUpdated(List<LeaveType> object) {
+                if (onDataUpdateListener != null) {
+                    onDataUpdateListener.onSuccessfulDataUpdated(object);
+                }
             }
         });
-
     }
 
     @Override

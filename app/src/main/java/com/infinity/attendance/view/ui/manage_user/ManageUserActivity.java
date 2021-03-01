@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -28,7 +29,7 @@ import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
 import java.util.List;
 
-public class ManageUserActivity extends AppCompatActivity implements OnDataUpdateListener {
+public class ManageUserActivity extends AppCompatActivity {
 
     private static final String TAG = "ManageUserActivity";
     private RecyclerView rvUserHolder;
@@ -85,7 +86,12 @@ public class ManageUserActivity extends AppCompatActivity implements OnDataUpdat
                 CreateOrUpdateUserDialog dialog = CreateOrUpdateUserDialog.newInstance(null);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 dialog.show(ft, CreateOrUpdateUserDialog.TAG);
-                dialog.setOnDataUpdateListener(ManageUserActivity.this);
+                dialog.setOnDataUpdateListener(new OnDataUpdateListener<Boolean>() {
+                    @Override
+                    public void onSuccessfulDataUpdated(Boolean object) {
+                        Toast.makeText(ManageUserActivity.this, "updated", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
         });
@@ -107,21 +113,16 @@ public class ManageUserActivity extends AppCompatActivity implements OnDataUpdat
         final User superUser = SharedPrefsHelper.getSuperUser(ManageUserActivity.this);
         //
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getAllUserLiveData(superUser.getApi_key()).observe(this, new Observer<ApiResponse<User>>() {
+        dataViewModel.getUser("").observe(this, new Observer<ApiResponse<User>>() {
             @Override
             public void onChanged(ApiResponse<User> userApiResponse) {
-                if (userApiResponse != null && !userApiResponse.isError()) {
-                    userList = userApiResponse.getResults();
+                if (userApiResponse != null) {
+                    userList = userApiResponse.getData();
                     adapterUser.updateList(userList);
                     adapterUser.notifyDataSetChanged();
                     tvUserCount.setText("" + userList.size());
                 }
             }
         });
-    }
-
-    @Override
-    public void onSuccessfulDataUpdated() {
-        bindRv();
     }
 }

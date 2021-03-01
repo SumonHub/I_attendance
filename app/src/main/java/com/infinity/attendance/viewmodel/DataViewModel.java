@@ -30,148 +30,137 @@ public class DataViewModel extends ViewModel {
         return repo.requestLogin(uid, password);
     }
 
-    public LiveData<ApiResponse> createOrUpdateUserRole(String apiKey, Role role) {
-        return repo.createOrUpdateUserRole(apiKey, role);
+    public LiveData<ApiResponse<User>> addUser(User user) {
+        return repo.addUser(user);
     }
 
-    public LiveData<ApiResponse<Role>> getAllUserRole(String apiKey) {
-        return repo.getAllUserRole(apiKey);
+    public LiveData<ApiResponse<User>> updateUser(User updatedUser) {
+        return repo.updateUser(updatedUser);
     }
 
-    public LiveData<ApiResponse<User>> createUser(String api_key, User user) {
-        return repo.createUser(api_key, user);
+    public LiveData<ApiResponse<UserInfo>> addUserInfo(String uid, UserInfo updatedUser) {
+        return repo.addUserInfo(uid, updatedUser);
     }
 
-    public LiveData<ApiResponse> updateUser(String api_key, User updatedUser) {
-        return repo.updateUser(api_key, updatedUser);
+    public LiveData<ApiResponse<User>> resetPassword(String uid, String newPassword) {
+        return repo.resetPassword(uid, newPassword);
     }
 
-    public LiveData<ApiResponse> addUserInfo(String api_key, UserInfo updatedUser) {
-        return repo.addUserInfo(api_key, updatedUser);
+    public LiveData<ApiResponse<User>> getUser(String uid) {
+        return repo.getUser(uid);
     }
 
-    public LiveData<ApiResponse> resetPassword(String api_key, String newPassword) {
-        return repo.resetPassword(api_key, newPassword);
+    public LiveData<ApiResponse<Attendance>> addAttendance(String uid, String date, String time, String location, int statusCode) {
+        return repo.addAttendance(uid, date, time, location, statusCode);
     }
 
-    public LiveData<ApiResponse<User>> getUserByKeyLiveData(String api_key) {
-        return repo.getUserByKey(api_key);
+    public LiveData<ApiResponse<Attendance>> getAttendanceReportByDateRange(String uid, String fromDate, String toDate) {
+        return repo.getAttendanceReportByDateRange(uid, fromDate, toDate);
+    }
+    // ========= role ================
+
+    public LiveData<ApiResponse<Role>> getAllUserRole() {
+        return repo.getRole();
     }
 
-    public LiveData<ApiResponse<UserInfo>> getUserInfoByKeyLiveData(String api_key) {
-        return repo.getUserInfoByKey(api_key);
-    }
-
-    public LiveData<ApiResponse<User>> getAllUserLiveData(String api_key) {
-        return repo.getAllUser(api_key);
-    }
-
-    public LiveData<ApiResponse<Attendance>> addAttendance(String api_key, String uid, String date, String time, String location, int statusCode) {
-        return repo.addAttendance(api_key, uid, date, time, location, statusCode);
-    }
-
-    //
-
-    public LiveData<ApiResponse<Attendance>> getAttendanceReportByDateRange(String api_key, String fromDate, String toDate) {
-        return repo.getAttendanceReportByDateRange(api_key, fromDate, toDate);
-    }
-
-    public LiveData<ApiResponse<OfficeTime>> getOfficeTimeLiveData(String api_key) {
-        return repo.getOfficeTimeList(api_key);
-    }
-
-    public LiveData<ApiResponse<Role>> getRoleLiveData(String api_key) {
-        return repo.getRoleList(api_key);
-    }
-
-    public LiveData<ApiResponse<LeaveType>> getLeaveType(String api_key) {
-        return repo.getLeaveType(api_key);
-    }
-
-    public LiveData<ApiResponse<Leave>> getUserLeaveHistory(String api_key) {
-        return repo.getUserLeaveHistory(api_key);
-    }
-
-    public LiveData<ApiResponse<Leave>> getAllLeaveHistory(String api_key) {
-        return repo.getAllLeaveHistory(api_key);
-    }
-
-    public LiveData<ApiResponse<Department>> getAllDepartment(String api_key) {
-        return repo.getAllDepartment(api_key);
-    }
-
-    public LiveData<ApiResponse<Designation>> getDesignation(String api_key, int dId) {
-        return repo.getAllDesignation(api_key, dId);
-    }
-
-    public LiveData<ApiResponse<Holiday>> getHolidayList(String api_key) {
-        return repo.getHolidayList(api_key);
+    public LiveData<ApiResponse<Role>> addRole(Role role) {
+        return repo.addRole(role);
     }
 
     //============= Leave ===============
 
-    public LiveData<ApiResponse> actionLeaveType(String api_key, LeaveType leaveType, int actionCode) {
-        return repo.actionLeaveType(api_key, leaveType, actionCode);
+    public LiveData<ApiResponse<Leave>> getLeaveHistory(String uid) {
+        return repo.getUserLeaveHistory(uid);
     }
 
-    public LiveData<ApiResponse> applyLeave(String api_key, Leave leave) {
-        return repo.applyLeave(api_key, leave);
+    public LiveData<ApiResponse<LeaveType>> getLeaveType() {
+        return repo.getLeaveType();
     }
 
-    public LiveData<ApiResponse<Leave>> changeLeaveStatus(String api_key, int id, int status) {
-        return repo.changeLeaveStatus(api_key, id, status);
+    public LiveData<ApiResponse<Leave>> applyLeave(Leave leave) {
+        return repo.applyLeave(leave);
     }
 
+    public LiveData<ApiResponse<Leave>> changeLeaveStatus(String id, Leave leave) {
+        return repo.changeLeaveStatus(id, leave);
+    }
 
     //----------------Department----------------
-
-    public LiveData<ApiResponse> createDepartment(String api_key, String department_name) {
-        return repo.createDepartment(api_key, department_name);
+    public LiveData<ApiResponse<Department>> getAllDepartment() {
+        return repo.getAllDepartment();
     }
 
-    public LiveData<ApiResponse> updateDepartment(String api_key, int id, String name) {
-        return repo.updateDepartment(api_key, id, name);
+    public LiveData<ApiResponse<Department>> addDepartment(Department department) {
+        return repo.addDepartment(department);
     }
 
-    public LiveData<ApiResponse> deleteDepartment(String api_key, int id) {
-        return repo.deleteDepartment(api_key, id);
+    public LiveData<ApiResponse<Department>> updateDepartment(Department department) {
+        return repo.updateDepartment(department);
+    }
+
+    public LiveData<ApiResponse<Department>> deleteDepartment(int id) {
+        return repo.deleteDepartment(id);
     }
 
     //============ Designation ===========
-
-    public LiveData<ApiResponse> createDesignation(String api_key, int dpt_id, String dg_name) {
-        return repo.createDesignation(api_key, dpt_id, dg_name);
+    public LiveData<ApiResponse<Designation>> getDesignationByDpt(int dpt_id) {
+        return repo.getDesignationByDpt(dpt_id);
     }
 
-    public LiveData<ApiResponse> updateDesignation(String api_key, int id, String name) {
-        return repo.updateDesignation(api_key, id, name);
+    public LiveData<ApiResponse<Designation>> addDesignation(Designation designation) {
+        return repo.addDesignation(designation);
     }
 
-    public LiveData<ApiResponse> deleteDesignation(String api_key, int id) {
-        return repo.deleteDesignation(api_key, id);
+    public LiveData<ApiResponse<Designation>> updateDesignation(Designation designation) {
+        return repo.updateDesignation(designation);
+    }
+
+    public LiveData<ApiResponse<Designation>> deleteDesignation(int designationId, int dpt_id) {
+        return repo.deleteDesignation(designationId, dpt_id);
     }
 
     // --------------holiday-------------------
-
-    public LiveData<ApiResponse<Holiday>> addHoliday(String api_key, String name, String date, int status) {
-        return repo.addHoliday(api_key, name, date, status);
+    public LiveData<ApiResponse<Holiday>> getHoliday() {
+        return repo.getHolidayList();
     }
 
-    public LiveData<ApiResponse<Holiday>> updateHoliday(String api_key, int id, String name, String date, int status) {
-        return repo.updateHoliday(api_key, id, name, date, status);
+    public LiveData<ApiResponse<Holiday>> addHoliday(Holiday holiday) {
+        return repo.addHoliday(holiday);
     }
 
-    public LiveData<ApiResponse<Holiday>> deleteHoliday(String api_key, int id, int status) {
-        return repo.deleteHoliday(api_key, id, status);
+    public LiveData<ApiResponse<Holiday>> updateHoliday(Holiday holiday) {
+        return repo.updateHoliday(holiday);
     }
 
-    public LiveData<ApiResponse> checkIsAnyOffday(String api_key) {
-        return repo.checkIsAnyOffday(api_key);
+    public LiveData<ApiResponse<Holiday>> deleteHoliday(int id) {
+        return repo.deleteHoliday(id);
     }
 
-    public LiveData<ApiResponse> updateOfficeTime(String api_key, OfficeTime officeTime) {
-        return repo.updateOfficeTime(api_key, officeTime);
+    public LiveData<ApiResponse> checkIsAnyOffday() {
+        return repo.checkIsAnyOffday();
     }
 
+    public LiveData<ApiResponse<OfficeTime>> getOfficeTimeLiveData() {
+        return repo.getOfficeTime();
+    }
 
+    public LiveData<ApiResponse<OfficeTime>> updateOfficeTime(OfficeTime officeTime) {
+        return repo.updateOfficeTime(officeTime);
+    }
+
+    public LiveData<ApiResponse<UserInfo>> getUserInfoLiveData(String uid) {
+        return repo.getUserInfo(uid);
+    }
+
+    public LiveData<ApiResponse<LeaveType>> addLeaveType(LeaveType newLeaveType) {
+        return repo.addLeaveType(newLeaveType);
+    }
+
+    public LiveData<ApiResponse<LeaveType>> updateLeaveType(LeaveType newLeaveType) {
+        return repo.updateLeaveType(newLeaveType);
+    }
+
+    public LiveData<ApiResponse<LeaveType>> deleteLeave(int id) {
+        return repo.deleteLeave(id);
+    }
 }

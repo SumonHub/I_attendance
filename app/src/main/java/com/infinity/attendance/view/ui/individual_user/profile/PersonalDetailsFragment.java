@@ -1,5 +1,6 @@
 package com.infinity.attendance.view.ui.individual_user.profile;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -151,10 +152,10 @@ public class PersonalDetailsFragment extends Fragment implements View.OnClickLis
                     _buildSelectedUserInfo();
 
                     DataViewModel dataViewModel = new DataViewModel();
-                    dataViewModel.addUserInfo(selectedUser.getApi_key(), selectedUserInfo).observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
+                    dataViewModel.addUserInfo(selectedUser.getUid(), selectedUserInfo).observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
                         @Override
                         public void onChanged(ApiResponse apiResponse) {
-                            if (apiResponse != null && !apiResponse.isError()) {
+                            if (apiResponse != null) {
                                 Toast.makeText(getContext(), apiResponse.getMsg(), Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
@@ -205,12 +206,12 @@ public class PersonalDetailsFragment extends Fragment implements View.OnClickLis
     private void bindData() {
 
         DataViewModel dataViewModel = new ViewModelProvider(this).get(DataViewModel.class);
-        dataViewModel.getUserInfoByKeyLiveData(selectedUser.getApi_key()).observe(getViewLifecycleOwner(),
+        dataViewModel.getUserInfoLiveData(selectedUser.getUid()).observe(getViewLifecycleOwner(),
                 new Observer<ApiResponse<UserInfo>>() {
                     @Override
                     public void onChanged(ApiResponse<UserInfo> userInfoApiResponse) {
-                        if (userInfoApiResponse != null && !userInfoApiResponse.isError()) {
-                            UserInfo userInfo = userInfoApiResponse.getResults().get(0);
+                        if (userInfoApiResponse != null) {
+                            UserInfo userInfo = userInfoApiResponse.getData().get(0);
                             selectedUserInfo = userInfo;
                             inputFatherName.setText(userInfo.getF_name());
                             inputMotherName.setText(userInfo.getM_name());
@@ -226,6 +227,7 @@ public class PersonalDetailsFragment extends Fragment implements View.OnClickLis
 
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         int id = view.getId();

@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,21 +21,21 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.infinity.attendance.R;
 import com.infinity.attendance.data.model.LeaveType;
-import com.infinity.attendance.data.model.User;
 import com.infinity.attendance.utils.OnDataUpdateListener;
-import com.infinity.attendance.utils.SharedPrefsHelper;
 import com.infinity.attendance.viewmodel.DataViewModel;
 import com.infinity.attendance.viewmodel.repo.ApiResponse;
 
+import java.util.List;
+
 public class AddLeaveTypeDialog extends DialogFragment {
     public static final String TAG = "AddLeaveTypeDialog";
-    public static final String SELECTED_LEAVE_TYPE = "SELECTED_LEAVE_TYPE";
+    public static final String SELECTED_LEAVE_TYPE = "SELECTED_LEAVE";
     private TextInputEditText inputLeaveName;
     private TextInputEditText inputLeaveBalance;
     private LeaveType selectedLeaveType;
     private boolean moodUpdate = false;
 
-    private OnDataUpdateListener onDataUpdateListener;
+    private OnDataUpdateListener<List<LeaveType>> onDataUpdateListener;
 
     public static AddLeaveTypeDialog newInstance(@Nullable Bundle bundle) {
         AddLeaveTypeDialog fragment = new AddLeaveTypeDialog();
@@ -44,7 +43,7 @@ public class AddLeaveTypeDialog extends DialogFragment {
         return fragment;
     }
 
-    public void setOnDataUpdateListener(OnDataUpdateListener onDataUpdateListener) {
+    public void setOnDataUpdateListener(OnDataUpdateListener<List<LeaveType>> onDataUpdateListener) {
         this.onDataUpdateListener = onDataUpdateListener;
     }
 
@@ -110,38 +109,59 @@ public class AddLeaveTypeDialog extends DialogFragment {
                 String balance = inputLeaveBalance.getText().toString();
                 //
                 LeaveType newLeaveType = new LeaveType();
-                int actionCode = LeaveType.ADD;
 
                 if (moodUpdate) {
-                    newLeaveType.setType_id(selectedLeaveType.getType_id());
+                    newLeaveType.setId(selectedLeaveType.getId());
                     newLeaveType.setName(name);
                     newLeaveType.setBalance(balance);
-
-                    actionCode = LeaveType.UPDATE;
+                    //
+                    _updateLeaveType(newLeaveType);
                 } else {
                     newLeaveType.setName(name);
                     newLeaveType.setBalance(balance);
+                    //
+                    _addLeaveType(newLeaveType);
                 }
 
-                Log.d(TAG, "newLeaveType: " + newLeaveType);
-
-                User user = SharedPrefsHelper.getSuperUser(getContext());
-
-                DataViewModel dataViewModel = new DataViewModel();
-                dataViewModel.actionLeaveType(user.getApi_key(), newLeaveType, actionCode)
-                        .observe(getViewLifecycleOwner(), new Observer<ApiResponse>() {
-                            @Override
-                            public void onChanged(ApiResponse apiResponse) {
-                                if (apiResponse != null && !apiResponse.isError()) {
-                                    Toast.makeText(getContext(), apiResponse.getMsg(), Toast.LENGTH_SHORT).show();
-                                    onDataUpdateListener.onSuccessfulDataUpdated();
-                                    AddLeaveTypeDialog.this.dismiss();
-                                } else {
-                                    Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
             }
         };
+    }
+
+    private void _updateLeaveType(LeaveType newLeaveType) {
+        DataViewModel dataViewModel = new DataViewModel();
+        dataViewModel.updateLeaveType(newLeaveType)
+                .observe(getViewLifecycleOwner(), new Observer<ApiResponse<LeaveType>>() {
+                    @Override
+                    public void onChanged(ApiResponse<LeaveType> leaveTypeApiResponse) {
+                        if (leaveTypeApiResponse != null && !leaveTypeApiResponse.isError()) {
+                            if (onDataUpdateListener != null) {
+                                Toast.makeText(getContext(), leaveTypeApiResponse.getMsg(), Toast.LENGTH_SHORT).show();
+                                onDataUpdateListener.onSuccessfulDataUpdated(leaveTypeApiResponse.getData());
+                                AddLeaveTypeDialog.this.dismiss();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void _addLeaveType(LeaveType newLeaveType) {
+        DataViewModel dataViewModel = new DataViewModel();
+        dataViewModel.addLeaveType(newLeaveType)
+                .observe(getViewLifecycleOwner(), new Observer<ApiResponse<LeaveType>>() {
+                    @Override
+                    public void onChanged(ApiResponse<LeaveType> leaveTypeApiResponse) {
+                        if (leaveTypeApiResponse != null && !leaveTypeApiResponse.isError()) {
+                            if (onDataUpdateListener != null) {
+                                Toast.makeText(getContext(), leaveTypeApiResponse.getMsg(), Toast.LENGTH_SHORT).show();
+                                onDataUpdateListener.onSuccessfulDataUpdated(leaveTypeApiResponse.getData());
+                                AddLeaveTypeDialog.this.dismiss();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }

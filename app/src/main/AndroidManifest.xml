@@ -21,8 +21,8 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".view.ui.individual_user.profile.ProfileInfoActivity" />
         <activity android:name=".view.ui.setting.SettingHolidayActivity" />
-        <activity android:name=".view.ui.setting.department_setting.SettingDesignationActivity" />
-        <activity android:name=".view.ui.setting.department_setting.SettingDepartmentActivity" />
+        <activity android:name=".view.ui.setting.department.SettingDesignationActivity" />
+        <activity android:name=".view.ui.setting.department.SettingDepartmentActivity" />
         <activity android:name=".view.ui.manage_leave.ManageLeaveActivity" />
         <activity android:name=".view.ui.individual_user.SingleUserActivity" />
         <activity android:name=".view.ui.setting.leave_type.SettingLeaveActivity" />
